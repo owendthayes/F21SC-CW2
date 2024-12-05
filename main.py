@@ -3,6 +3,9 @@ from tkinter import *
 import pandas as pd
 import re
 from pycountry_convert import country_alpha2_to_continent_code, convert_continent_code_to_continent_name
+import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 FILE_NAME = 'test.json'
 #reading in data
@@ -14,49 +17,72 @@ with open('fixed_file.json', 'w') as file:
 with open('fixed_file.json', 'r') as file:
     data = json.load(file)
 
+root = Tk()
+
 ##GUI STUFF
 def gui():
-    root = Tk()
     root.title("F20SC-CW2 Data Analysis Tracker")
-    root.geometry('700x500')
+    root.geometry('900x600')
 
-    lbl = Label(root, text = "test")
-    lbl.pack(side = "top")
-
-    def clicked():
-        lbl.configure("oh god the pain")
+    bar_chart_frame = Frame(root)
+    bar_chart_frame.pack(fill="x", expand=True)
 
     ##BUTTONS TO BE USED FOR STUFF
     bottom_frame = Frame(root) #creates frame area for the bottom row (used as button area)
     bottom_frame.pack(side="bottom", fill="x") #fills from the bottom left
 
-    btn1 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked)
-    btn1.pack(side = "left")
+    top_frame = Frame(root) #creates frame area for the top row (used as text area)
+    top_frame.pack(side="top", fill="x") #fills from the top left
 
-    btn2 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked)
-    btn2.pack(side = "left")
+    def clicked_search_doc_country():
+        create_bar_chart(search_country("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each country for document","Country", "Frequency")
 
-    btn3 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked)
+    btn_view_document_country = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn_view_document_country.pack(side = "left")
+    
+    def clicked_search_doc_continent():
+        create_bar_chart(search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each continent for document","Country", "Frequency")
+
+    btn_view_document_continent = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_continent)
+    btn_view_document_continent.pack(side = "left")
+
+    btn3 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
     btn3.pack(side = "left")
 
-    btn4 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked)
+    btn4 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
     btn4.pack(side = "left")
 
-    btn5 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked)
+    btn5 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
     btn5.pack(side = "left")
+
     root.mainloop()
 
+def create_bar_chart(freq, searched, title, x, y):
+    fig = Figure(figsize=(10,10), dpi= 100)
+    ax = fig.add_subplot(111)
+
+    ax.bar(freq.index, freq.values, color='skyblue')
+    ax.set_title(f"{title}: {searched}")
+    ax.set_xlabel(x)
+    ax.set_ylabel(y)
+    ax.tick_params(axis='x', rotation=45)
+
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas_widget = canvas.get_tk_widget()
+    canvas_widget.pack(side="top", fill="both", expand=True)
+    canvas.draw()
 
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
-    search_continent(countries) #calls search continent method
     print(pd.Series(countries).value_counts()) #DEBUGGING
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
 
-def search_continent(countries):
+def search_continent(document):
+    #creates list of all countries which have viewed the document
+    countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)]
     #creates list of all continents included in the list of user countries
     continents = [convert_continent_code_to_continent_name(country_alpha2_to_continent_code(country)) for country in countries]
     print(pd.Series(continents).value_counts()) #DEBUGGING
@@ -87,7 +113,7 @@ def reader_profile():
     return pd.Series(users).value_counts().head(10)
 
 
-search_country("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0")
-views_by_browser()
-reader_profile()
+#search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0")
+#views_by_browser()
+#reader_profile()
 gui()
