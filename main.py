@@ -93,7 +93,7 @@ def clicked_load_file(filePath):
 
 def gui_main_test():
     print("3 - new window opened.")
-    root = Tk()
+    root = Tk() ##THIS WILL NEED LOOKED AT, IDK IF THIS IS CORRECT
     root.title("F20SC-CW2 Data Analysis Tracker")
     root.geometry('900x600')
 
