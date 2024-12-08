@@ -60,8 +60,7 @@ def clicked_load_file(filePath):
         with open(FILE_NAME, 'r') as file:
             ##lines = [line.strip() for line in file if line.strip()]
             data = json.load(file)
-            print(data)
-            return data
+            print("File loaded Successfully")
 
         # fixed_json = "[\n" + ",\n".join(lines) + "\n]"
         # with open('fixed_file.json', 'w') as file:
@@ -85,53 +84,82 @@ def clicked_load_file(filePath):
         lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red", text="An unknown error has occured.")
         lbl_error_msg.grid(row=2, column=1, sticky = 'n')
 
+    else:
+        print("1 - closing current window")
+        root.withdraw()
+        print("2 - Opening new window")
+        gui_main_test()
 
+
+def gui_main_test():
+    print("3 - new window opened.")
+    root = Tk()
+    root.title("F20SC-CW2 Data Analysis Tracker")
+    root.geometry('900x600')
+
+    ##grid for managing placement of widgets
+    root.columnconfigure(0, weight = 1)
+    root.columnconfigure(1, weight = 1)
+    root.columnconfigure(2, weight = 1)
+
+    root.rowconfigure(0, weight = 1)
+    root.rowconfigure(1, weight = 1)
+    root.rowconfigure(2, weight = 1)   
+
+    ##elements of main page
+    lbl_load_file = Label(root, font = ("Arial", 14) ,fg= "red", height = 1, width = 30, text="new window! :D")
+    lbl_load_file.grid(row=0, column=1, sticky = 's')
+
+    root.mainloop()
+        
+def gui_main():
+    bar_chart_frame = Frame(root)
+    bar_chart_frame.pack(fill="x", expand=True)
+
+    ##BUTTONS TO BE USED FOR STUFF
+    bottom_frame = Frame(root) #creates frame area for the bottom row (used as button area)
+    bottom_frame.pack(side="bottom", fill="x") #fills from the bottom left
+
+    top_frame = Frame(root)
+    top_frame.pack(side =  "top", fill = "x")
+
+    top_frame = Frame(root) #creates frame area for the top row (used as text area)
+    top_frame.pack(side="top", fill="x") #fills from the top left
+
+    def clicked_search_doc_country():
+        create_bar_chart(search_country("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each country for document","Country", "Frequency")
+
+    btn_view_document_country = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn_view_document_country.pack(side = "left")
+    
+    def clicked_search_doc_continent():
+        create_bar_chart(search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each continent for document","Country", "Frequency")
+
+    btn_view_document_continent = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_continent)
+    btn_view_document_continent.pack(side = "left")
+
+    btn3 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn3.pack(side = "left")
+
+    btn4 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn4.pack(side = "left")
+
+    btn5 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn5.pack(side = "left")
+
+    
+    ##CHOOSING INPUT FILE
+    txtLoadFile = Text(top_frame, font = ("Arial", 14), fg = "blue", height = 1.4, width = 30)
+    txtLoadFile.pack(side = "left", anchor = "nw")
+
+    btnLoadFile = Button(top_frame, text = "select file", font = ("Arial", 14) ,fg= "blue", command=load_input_file)
+    btnLoadFile.pack(side = "left", anchor = "nw")
+
+    root.mainloop()
 
     
 
-##bar_chart_frame = Frame(root)
-    # bar_chart_frame.pack(fill="x", expand=True)
 
-    # ##BUTTONS TO BE USED FOR STUFF
-    # bottom_frame = Frame(root) #creates frame area for the bottom row (used as button area)
-    # bottom_frame.pack(side="bottom", fill="x") #fills from the bottom left
-
-    # top_frame = Frame(root)
-    # top_frame.pack(side =  "top", fill = "x")
-
-    # top_frame = Frame(root) #creates frame area for the top row (used as text area)
-    # top_frame.pack(side="top", fill="x") #fills from the top left
-
-    # def clicked_search_doc_country():
-    #     create_bar_chart(search_country("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each country for document","Country", "Frequency")
-
-    # btn_view_document_country = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    # btn_view_document_country.pack(side = "left")
-    
-    # def clicked_search_doc_continent():
-    #     create_bar_chart(search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each continent for document","Country", "Frequency")
-
-    # btn_view_document_continent = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_continent)
-    #     btn_view_document_continent.pack(side = "left")
-
-    #     btn3 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    #     btn3.pack(side = "left")
-
-    #     btn4 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    #     btn4.pack(side = "left")
-
-    #     btn5 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    #     btn5.pack(side = "left")
-
-    
-    # ##CHOOSING INPUT FILE
-    # txtLoadFile = Text(top_frame, font = ("Arial", 14), fg = "blue", height = 1.4, width = 30)
-    # txtLoadFile.pack(side = "left", anchor = "nw")
-
-    # ##btnLoadFile = Button(top_frame, text = "select file", font = ("Arial", 14) ,fg= "blue", command=load_input_file)
-    # ##btnLoadFile.pack(side = "left", anchor = "nw")
-
-    # root.mainloop()
 
 ##MR DONNELLY, WE PROBABLY GONNA HAVE TO DO LOADFILE(FILENAME) WHEN WE RUN SHIT? MAYBE PASS IN AS A PARAMETER FOR EACH FUNCTION? IDK THIS IS SO CONFUSING
     # i reckon if we have a bit of the GUI that opens before the functionality
