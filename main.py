@@ -8,18 +8,22 @@ import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-FILE_NAME = "\\" + txtLoadFile.get("1.0", END)
-print(FILE_NAME)
-#reading in data
-with open(FILE_NAME, 'r') as file:
-    lines = [line.strip() for line in file if line.strip()]
-fixed_json = "[\n" + ",\n".join(lines) + "\n]"
-with open('fixed_file.json', 'w') as file:
-    file.write(fixed_json)
-with open('fixed_file.json', 'r') as file:
-    data = json.load(file)
+
 
 root = Tk()
+
+##LOADING IN FILE AS A REUSABLE FUNCTION
+def loadFile(fileName):
+    FILE_NAME = fileName
+    print(FILE_NAME)
+    #reading in data
+    with open(FILE_NAME, 'r') as file:
+        lines = [line.strip() for line in file if line.strip()]
+    fixed_json = "[\n" + ",\n".join(lines) + "\n]"
+    with open('fixed_file.json', 'w') as file:
+        file.write(fixed_json)
+    with open('fixed_file.json', 'r') as file:
+        data = json.load(file)
 
 ##GUI STUFF
 def gui():
@@ -47,6 +51,13 @@ def gui():
     
     def clicked_search_doc_continent():
         create_bar_chart(search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each continent for document","Country", "Frequency")
+
+
+##MR DONNELLY, WE PROBABLY GONNA HAVE TO DO LOADFILE(FILENAME) WHEN WE RUN SHIT? MAYBE PASS IN AS A PARAMETER FOR EACH FUNCTION? IDK THIS IS SO CONFUSING
+    # i reckon if we have a bit of the GUI that opens before the functionality
+    # user inputs the file path of the file they wanna use then they can continue with the graphs and shit
+    # then they can go back and do a different file if they want.
+    # ill try add it but if it works you'll never see this message hehe
 
 
 ##ngl idk if this is needed, we might just need to do it in command line? im not rly sure
@@ -84,12 +95,13 @@ def gui():
     txtLoadFile = Text(top_frame, font = ("Arial", 14), fg = "blue", height = 1.4, width = 30)
     txtLoadFile.pack(side = "left", anchor = "nw")
 
-    btnLoadFile = Button(top_frame, text = "select file", font = ("Arial", 14) ,fg= "blue", command=load_input_file)
-    btnLoadFile.pack(side = "left", anchor = "nw")
+    ##btnLoadFile = Button(top_frame, text = "select file", font = ("Arial", 14) ,fg= "blue", command=load_input_file)
+    ##btnLoadFile.pack(side = "left", anchor = "nw")
 
     root.mainloop()
 
 def create_bar_chart(freq, searched, title, x, y):
+    loadFile("test.json")
     fig = Figure(figsize=(10,10), dpi= 100)
     ax = fig.add_subplot(111)
 
@@ -107,12 +119,14 @@ def create_bar_chart(freq, searched, title, x, y):
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"
+    loadFile("test.json")
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
     print(pd.Series(countries).value_counts()) #DEBUGGING
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
 
 def search_continent(document):
+    loadFile("test.json")
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)]
     #creates list of all continents included in the list of user countries
@@ -122,6 +136,7 @@ def search_continent(document):
 
 ##REQ 3 A e.g. entire useragent string
 def views_by_browser_verbose():
+    loadFile("test.json")
     browsers = []
 
     #populating all browsers into list
@@ -138,6 +153,7 @@ def views_by_browser_verbose():
 
 ##REQ 3 B e.g. 'Mozilla'
 def views_by_browser_short():
+    loadFile("test.json")
     browsers = []
 
     #populating all browsers into list
@@ -154,6 +170,7 @@ def views_by_browser_short():
 
 ##REQ 4
 def reader_profile():
+    loadFile("test.json")
     #creates list of all user ids found in the list allowing for duplicate entries
     users = [user.get("visitor_uuid") for user in data] 
     print(pd.Series(users).value_counts().head(10)) #DEBUGGING
@@ -161,6 +178,26 @@ def reader_profile():
     return pd.Series(users).value_counts().head(10)
 
 ##REQ 5
+def users_from_doc(document):
+    loadFile("test.json")
+    ##get list of users that have read the given document
+    ##DONT THINK (DOCUMENT) WILL WORK AS PARAMETER, CHANGE LATER.
+    doc = json.load(document)
+    readers = []
+    for obj in document:    ## this probably will not work, gotta load file
+        if obj.get("vistor_uuid") not in readers:
+            visitorID = obj.get("visitor_uuid")
+            readers.append(visitorID)
+    return readers
+
+def docs_from_users(visitorID):
+    loadFile("test.json")
+    ##get list of documents that user has read
+    documents = []
+
+
+        
+
 
 #search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0")
 #views_by_browser()
