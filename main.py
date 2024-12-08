@@ -8,23 +8,21 @@ import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-##LOADING IN FILE AS A REUSABLE FUNCTION
-# def loadFile(fileName):
-#     FILE_NAME = fileName
-#     print(FILE_NAME)
-#     #reading in data
-#     with open(FILE_NAME, 'r') as file:
-#         lines = [line.strip() for line in file if line.strip()]
-#     fixed_json = "[\n" + ",\n".join(lines) + "\n]"
-#     with open('fixed_file.json', 'w') as file:
-#         file.write(fixed_json)
-#     with open('fixed_file.json', 'r') as file:
-#         data = json.load(file)
+# TO DO LIST
+# - REQUIREMENT 5 (ALSO LIKES)
+# - REQUIREMENT 6 (ALSO LIKES GRAPH)
+# - GET RID OF HARD CODED SHIT
+# - COMMAND LINE TESTING (CHECK SPEC)
+# - IDK WE GOTTA CHECK THE SPEC MAKE SURE WE GOT IT COVERED
+# - VIDEO
+# - REPORT
+# - COMMENT CODE
 
 root = Tk()
 
-##GUI STUFF
+##GUI FOR CHOOSING INPUT FILE
 def gui_load_file():
+
     root.title("F20SC-CW2 Data Analysis Tracker")
     root.geometry('900x600')
 
@@ -41,16 +39,17 @@ def gui_load_file():
     lbl_load_file = Label(root, font = ("Arial", 14) ,fg= "red", height = 1, width = 30, text="enter file path")
     lbl_load_file.grid(row=0, column=1, sticky = 's')
 
-    txt_filePath = Text(root, font = ("Arial", 14) ,fg= "red", height = 1, width = 30)
+    txt_filePath = Text(root, font = ("Arial", 14) ,fg= "red", height = 1, width = 30   )
     txt_filePath.grid(row=1, column=1,)
 
     btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "red", command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c')))
-    
     btn_choose_file.grid(row=1, column=2, sticky = 'w')
 
     root.mainloop()
 
+##FUNCTION FOR LOADING FILE FROM INPUTTED FILE PATH
 def clicked_load_file(filePath):
+    global data
     ##try to load file
     FILE_NAME =  "\\" + filePath.strip()
     print("Processing file: {FILE_NAME}")
@@ -61,13 +60,6 @@ def clicked_load_file(filePath):
             ##lines = [line.strip() for line in file if line.strip()]
             data = json.load(file)
             print("File loaded Successfully")
-
-        # fixed_json = "[\n" + ",\n".join(lines) + "\n]"
-        # with open('fixed_file.json', 'w') as file:
-        #     file.write(fixed_json)
-        # with open('fixed_file.json', 'r') as file:
-        #     data = json.load(file)
-        # print("File loaded successfully!")
 
     except FileNotFoundError:
         print(f"File not found: {FILE_NAME}")
@@ -88,12 +80,13 @@ def clicked_load_file(filePath):
         print("1 - closing current window")
         root.withdraw()
         print("2 - Opening new window")
-        gui_main_test()
+        gui_main()
+        return data
+        
+def gui_main():
+    global root
+    root = Tk()
 
-
-def gui_main_test():
-    print("3 - new window opened.")
-    root = Tk() ##THIS WILL NEED LOOKED AT, IDK IF THIS IS CORRECT
     root.title("F20SC-CW2 Data Analysis Tracker")
     root.geometry('900x600')
 
@@ -101,92 +94,46 @@ def gui_main_test():
     root.columnconfigure(0, weight = 1)
     root.columnconfigure(1, weight = 1)
     root.columnconfigure(2, weight = 1)
-
+    root.columnconfigure(3, weight = 1)
+    root.columnconfigure(4, weight = 1)
+    
     root.rowconfigure(0, weight = 1)
     root.rowconfigure(1, weight = 1)
-    root.rowconfigure(2, weight = 1)   
-
-    ##elements of main page
-    lbl_load_file = Label(root, font = ("Arial", 14) ,fg= "red", height = 1, width = 30, text="new window! :D")
-    lbl_load_file.grid(row=0, column=1, sticky = 's')
-
-    root.mainloop()
-        
-def gui_main():
-    bar_chart_frame = Frame(root)
-    bar_chart_frame.pack(fill="x", expand=True)
-
-    ##BUTTONS TO BE USED FOR STUFF
-    bottom_frame = Frame(root) #creates frame area for the bottom row (used as button area)
-    bottom_frame.pack(side="bottom", fill="x") #fills from the bottom left
-
-    top_frame = Frame(root)
-    top_frame.pack(side =  "top", fill = "x")
-
-    top_frame = Frame(root) #creates frame area for the top row (used as text area)
-    top_frame.pack(side="top", fill="x") #fills from the top left
-
+    root.rowconfigure(2, weight = 1)  
+     
+    ##BUTTON FUNCTIONS, NEED CHANGED LATER TO NOT BE HARD CODED
     def clicked_search_doc_country():
         create_bar_chart(search_country("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each country for document","Country", "Frequency")
-
-    btn_view_document_country = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    btn_view_document_country.pack(side = "left")
-    
+ 
     def clicked_search_doc_continent():
         create_bar_chart(search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each continent for document","Country", "Frequency")
 
-    btn_view_document_continent = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_continent)
-    btn_view_document_continent.pack(side = "left")
+    def clicked_views_by_browser_verbose():
+        create_bar_chart(views_by_browser_verbose(""))
 
-    btn3 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    btn3.pack(side = "left")
+    def clicked_views_by_browser_short():
+        create_bar_chart(views_by_browser_short(""))
 
-    btn4 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    btn4.pack(side = "left")
-
-    btn5 = Button(bottom_frame, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
-    btn5.pack(side = "left")
-
+    ##BUTTONS TO BE USED FOR STUFF
+    btn_view_document_country = Button(root, text = "Search visitors by country", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn_view_document_country.grid(row=3, column=0)
     
-    ##CHOOSING INPUT FILE
-    txtLoadFile = Text(top_frame, font = ("Arial", 14), fg = "blue", height = 1.4, width = 30)
-    txtLoadFile.pack(side = "left", anchor = "nw")
+    btn_view_document_continent = Button(root, text = "Search document visitors by continent", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_continent)
+    btn_view_document_continent.grid(row=3,column=1)
 
-    btnLoadFile = Button(top_frame, text = "select file", font = ("Arial", 14) ,fg= "blue", command=load_input_file)
-    btnLoadFile.pack(side = "left", anchor = "nw")
+    btn3 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_views_by_browser_verbose)
+    btn3.grid(row=3, column=2)
+
+    btn4 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_views_by_country_short)
+    btn4.grid(row=3, column=3)
+
+    btn5 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
+    btn5.grid(row=3, column=4)   
 
     root.mainloop()
 
-    
-
-
-
-##MR DONNELLY, WE PROBABLY GONNA HAVE TO DO LOADFILE(FILENAME) WHEN WE RUN SHIT? MAYBE PASS IN AS A PARAMETER FOR EACH FUNCTION? IDK THIS IS SO CONFUSING
-    # i reckon if we have a bit of the GUI that opens before the functionality
-    # user inputs the file path of the file they wanna use then they can continue with the graphs and shit
-    # then they can go back and do a different file if they want.
-    # ill try add it but if it works you'll never see this message hehe
-
-
-##ngl idk if this is needed, we might just need to do it in command line? im not rly sure
-    # def load_input_file():
-    #     try:
-    #         FILE_NAME = "\\" + txtLoadFile.get("1.0", END)
-    #         print(FILE_NAME)
-    #         #reading in data
-    #         with open(FILE_NAME, 'r') as file:
-    #             lines = [line.strip() for line in file if line.strip()]
-    #         fixed_json = "[\n" + ",\n".join(lines) + "\n]"
-    #         with open('fixed_file.json', 'w') as file:
-    #             file.write(fixed_json)
-    #         with open('fixed_file.json', 'r') as file:
-    #             data = json.load(file)
-    #     except Exception as e:
-    #         print(repr(e))
-
-
+##CHARTS ARENT DISPLAYING IDK WHY
 def create_bar_chart(freq, searched, title, x, y):
-    loadFile("test.json")
     fig = Figure(figsize=(10,10), dpi= 100)
     ax = fig.add_subplot(111)
 
@@ -198,20 +145,16 @@ def create_bar_chart(freq, searched, title, x, y):
 
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas_widget = canvas.get_tk_widget()
-    canvas_widget.pack(side="top", fill="both", expand=True)
-    canvas.draw()
-
+    canvas_widget.grid(row=1, column=2)
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"
-    loadFile("test.json")
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
     print(pd.Series(countries).value_counts()) #DEBUGGING
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
 
 def search_continent(document):
-    loadFile("test.json")
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)]
     #creates list of all continents included in the list of user countries
@@ -221,7 +164,6 @@ def search_continent(document):
 
 ##REQ 3 A e.g. entire useragent string
 def views_by_browser_verbose():
-    loadFile("test.json")
     browsers = []
 
     #populating all browsers into list
@@ -238,7 +180,6 @@ def views_by_browser_verbose():
 
 ##REQ 3 B e.g. 'Mozilla'
 def views_by_browser_short():
-    loadFile("test.json")
     browsers = []
 
     #populating all browsers into list
@@ -255,7 +196,6 @@ def views_by_browser_short():
 
 ##REQ 4
 def reader_profile():
-    loadFile("test.json")
     #creates list of all user ids found in the list allowing for duplicate entries
     users = [user.get("visitor_uuid") for user in data] 
     print(pd.Series(users).value_counts().head(10)) #DEBUGGING
@@ -264,7 +204,6 @@ def reader_profile():
 
 ##REQ 5
 def users_from_doc(document):
-    loadFile("test.json")
     ##get list of users that have read the given document
     ##DONT THINK (DOCUMENT) WILL WORK AS PARAMETER, CHANGE LATER.
     doc = json.load(document)
@@ -276,7 +215,6 @@ def users_from_doc(document):
     return readers
 
 def docs_from_users(visitorID):
-    loadFile("test.json")
     ##get list of documents that user has read
     documents = []
 
