@@ -22,7 +22,6 @@ root = Tk()
 
 ##GUI FOR CHOOSING INPUT FILE
 def gui_load_file():
-    root = Tk()
     
     root.title("F20SC-CW2 Data Analysis Tracker")
     root.geometry('900x600')
@@ -109,10 +108,11 @@ def gui_main():
         
     #HIDES AND SHOWS BUTTONS ALLOWING FOR GRID TO BE CREATED AVOIDING FORMATTING ISSUES
     def button_hiding_showing_helper():
+        print("isis")
         btn_view_document_continent.grid_remove()
         btn_view_document_country.grid_remove()
-        btn3.grid_remove()
-        btn4.grid_remove()
+        btn_views_by_browser_verbose.grid_remove()
+        btn_views_by_browser_short.grid_remove()
         btn5.grid_remove()
         btn_back_to_load.grid_remove()
 
@@ -129,8 +129,8 @@ def gui_main():
     def back_to_main():
         btn_view_document_continent.grid()
         btn_view_document_country.grid()
-        btn3.grid()
-        btn4.grid()
+        btn_views_by_browser_verbose.grid()
+        btn_views_by_browser_short.grid()
         btn5.grid()
         btn_back_to_load.grid()
 
@@ -142,40 +142,69 @@ def gui_main():
         root.withdraw()
         gui_load_file()
 
-    #top_frame = Frame(root, height=3, width=4).grid(row=0, column=0, sticky = 'nw', columnspan=5)
-    
     ##BUTTONS TO BE USED FOR STUFF
-    btn_view_document_country = Button(root, text = "Search visitors by country", font = ("Arial", 14) ,fg= "red", command=lambda: (button_hiding_showing_helper, toggle_flag("country")))
+    btn_view_document_country = Button(root, text = "Search visitors\nby country", font = ("Arial", 14), height =5,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("country"))) #
     btn_view_document_country.grid(row=2, column=0)
     
-    btn_view_document_continent = Button(root, text = "Search document visitors by continent", font = ("Arial", 14) ,fg= "red", command=lambda: (button_hiding_showing_helper, toggle_flag("continent")))
+    btn_view_document_continent = Button(root, text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("continent")))
     btn_view_document_continent.grid(row=2,column=1)
 
-    btn3 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=lambda: (button_hiding_showing_helper, toggle_flag("continent")))
-    btn3.grid(row=2, column=2)
+    btn_views_by_browser_verbose = Button(root, text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("continent")))
+    btn_views_by_browser_verbose.grid(row=2, column=2)
 
-    btn4 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=lambda: (button_hiding_showing_helper, toggle_flag("continent")))
-    btn4.grid(row=2, column=3)
+    btn_views_by_browser_short = Button(root, text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("continent")))
+    btn_views_by_browser_short.grid(row=2, column=3)
 
-    btn5 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=lambda: (button_hiding_showing_helper, toggle_flag("continent")))
+    btn5 = Button(root, text = "owen is gay", font = ("Arial", 14) ,fg= "red", height =5, command=lambda: (button_hiding_showing_helper, toggle_flag("continent")))
     btn5.grid(row=2, column=4)   
-
-    def the_fixer():
-        if (states.get("country") == True):
-            print("bastard") #i agree
-            freq = search_country(txt_doc.get(1.0, END).strip())
-            title = "Document viewed per country"
-            x = "country"
-            y = "freq"
-            states['country'] = False
-
-        return (freq, txt_doc.get(1.0, END).strip(), title, x, y)
 
     txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
     txt_doc.grid(row=0, column=0, sticky = 'nw', columnspan=5)
     txt_doc.grid_remove()
 
-    btn_choose_doc = Button(root, text = "choose document", font = ("Arial", 14) ,fg= "red", command=lambda:create_bar_chart(the_fixer), padx=20)
+    #he is the fixer, he fixes things
+    def the_fixer():
+        print("boo")
+        if (states.get("country") == True):
+            print("bastard") #i agree
+            freq = search_country(txt_doc.get(1.0, END).strip())
+            print(freq)
+            title = "Document viewed per country"
+            x = "country"
+            y = "freq"
+
+        elif (states.get("continent") == True):
+            freq = search_continent(txt_doc.get(1.0, END).strip())
+            title = "Document viewed per continent"
+            x = "continent"
+            y = "freq"
+
+        elif (states.get("views_verbose") == True):
+            freq = views_by_browser_verbose(txt_doc.get(1.0, END).strip())
+            title = "Document viewed per country"
+            x = "browser"
+            y = "views"
+
+        elif (states.get("views_short") == True):
+            freq = views_by_browser_short(txt_doc.get(1.0, END).strip())
+            title = "Document viewed per country"
+            x = "browser"
+            y = "views"
+
+        elif (states.get("reader") == True):
+            freq = reader_profile(txt_doc.get(1.0, END).strip())
+            title = "Top Viewers"
+            x = "User"
+            y = "Time spent"
+
+        else:
+            print("WARNING: SOMETHING HAS GONE HORRIBLY WRONG")
+
+        print("mongoloid", freq)
+
+        return freq ,txt_doc.get(1.0, END).strip() ,title, x, y
+    
+    btn_choose_doc = Button(root, text = "choose document", font = ("Arial", 14) ,fg= "red", command=lambda:create_bar_chart(the_fixer(), root), padx=20)
     btn_choose_doc.grid(row=0, column=1, columnspan=5, sticky='n')
     btn_choose_doc.grid_remove()
 
@@ -188,8 +217,11 @@ def gui_main():
 
     root.mainloop()
 
+
+
 ##CHARTS ARENT DISPLAYING IDK WHY
-def create_bar_chart(freq, searched, title, x, y):
+def create_bar_chart(parameters, root):
+    freq, searched, title, x, y = parameters
     fig = Figure(figsize=(root.winfo_screenwidth(),5), dpi= 80)
     ax = fig.add_subplot(111)
 
@@ -205,8 +237,10 @@ def create_bar_chart(freq, searched, title, x, y):
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"   
+    print("penis")
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
+
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
 
 def search_continent(document):
@@ -260,6 +294,7 @@ def reader_profile():
 
 
 ##REQ 5
+#helper functions
 def users_from_doc(documentID):
     #get list of users that have read the given document
     users_viewed = []
@@ -276,14 +311,25 @@ def docs_from_users(visitorID):
             documents_viewed.append(obj.get("env_doc_id"))
     return documents_viewed
 
-def also_like(documentID, visitorID, ):
-    #get list of "Liked documents"
-    users = users_from_doc(documentID)
-    
-    all_read_docs = []
-    for user in users:
-        all_read_docs.append(docs_from_users(user))
+#actual function
+#what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
+# def also_like(documentID, visitorID, key):
+#     #get list of "Liked documents"
+#     users = users_from_doc(documentID)
 
+#     liked_docs = []
+    
+#     all_read_docs = []
+#     for user in users:
+#         all_read_docs.append(docs_from_users(user))
+    
+#     # doc_counts = Counter(all_read_docs)  # Count the occurrences of each document
+#     # sorted_docs = sorted(doc_counts.items(), key=lambda x: x[1], reverse=True)  # Sort by count in descending order
+    
+#     # Optional: Extract only the document IDs, ignoring the counts
+#     # sorted_doc_ids = [doc for doc, count in sorted_docs]
+
+#     return liked_docs
     
     
 
