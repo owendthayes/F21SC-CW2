@@ -95,7 +95,7 @@ def gui_main():
 
     ##grid for managing placement of widgets
     root.columnconfigure(0, weight = 1)
-    root.columnconfigure(1, weight = 1)
+    root.columnconfigure(1, weight = 1, uniform = 'column')
     root.columnconfigure(2, weight = 1)
     root.columnconfigure(3, weight = 1)
     root.columnconfigure(4, weight = 1)
@@ -103,11 +103,27 @@ def gui_main():
     root.rowconfigure(0, weight = 1)
     root.rowconfigure(1, weight = 1)
     root.rowconfigure(2, weight = 1)  
-     
+
+        
+
     ##BUTTON FUNCTIONS, NEED CHANGED LATER TO NOT BE HARD CODED
     def clicked_search_doc_country():
-        create_bar_chart(search_country("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each country for document","Country", "Frequency")
- 
+        btn_view_document_continent.grid_remove()
+        btn_view_document_country.grid_remove()
+        btn3.grid_remove()
+        btn4.grid_remove()
+        btn5.grid_remove()
+
+        btn_choose_doc.grid()
+        txt_doc.grid()
+        btn_back.grid()
+                   
+    def back_to_load():
+        print("kys")
+        
+    def back_to_main():
+        btn_back.grid_remove()
+
     def clicked_search_doc_continent():
         create_bar_chart(search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0"), "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "Visitor frequency from each continent for document","Country", "Frequency")
 
@@ -117,6 +133,8 @@ def gui_main():
     def clicked_views_by_browser_short():
         create_bar_chart(views_by_browser_short(""))
 
+    #top_frame = Frame(root, height=3, width=4).grid(row=0, column=0, sticky = 'nw', columnspan=5)
+    
     ##BUTTONS TO BE USED FOR STUFF
     btn_view_document_country = Button(root, text = "Search visitors by country", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
     btn_view_document_country.grid(row=3, column=0)
@@ -133,11 +151,23 @@ def gui_main():
     btn5 = Button(root, text = "Hit me", font = ("Arial", 14) ,fg= "red", command=clicked_search_doc_country)
     btn5.grid(row=3, column=4)   
 
+    txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
+    txt_doc.grid(row=0, column=0, sticky = 'nw', columnspan=5)
+    txt_doc.grid_remove()
+
+    btn_choose_doc = Button(root, text = "choose document", font = ("Arial", 14) ,fg= "red", command=lambda:create_bar_chart(search_country(txt_doc.get(1.0, END).strip()), txt_doc.get(1.0, END), "Visitor frequency from each country for document","Country", "Frequency"), padx=20)
+    btn_choose_doc.grid(row=0, column=1, columnspan=5, sticky='n')
+    btn_choose_doc.grid_remove()
+
+    btn_back = Button(root, text = "back", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_main, width=10, height=1)
+    btn_back.grid(row=2, column=0, sticky='sw', columnspan=5)
+    btn_back.grid_remove()
+
     root.mainloop()
 
 ##CHARTS ARENT DISPLAYING IDK WHY
 def create_bar_chart(freq, searched, title, x, y):
-    fig = Figure(figsize=(10,10), dpi= 80)
+    fig = Figure(figsize=(root.winfo_screenwidth(),5), dpi= 80)
     ax = fig.add_subplot(111)
 
     ax.bar(freq.index, freq.values, color='skyblue')
@@ -151,7 +181,7 @@ def create_bar_chart(freq, searched, title, x, y):
     canvas_widget.grid(row=1, column=2)
 
 ## REQ 2
-def search_country(document):# "subject_doc_id"
+def search_country(document):# "subject_doc_id"   
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
