@@ -28,7 +28,7 @@ def gui_load_file():
     root.title("F20SC-CW2 Data Analysis Tracker")
     app_width = 700
     app_height = 300
-    root.geometry(f'{app_width}x{app_height}')
+    root.geometry(f'{app_width}x{app_height}+{100}+{100}')
     root.configure(bg="MediumPurple1")
 
     ##grid for managing placement of widgets
