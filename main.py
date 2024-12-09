@@ -63,9 +63,6 @@ def clicked_load_file(filePath, root):
         json_objects = unparsed_data.strip().split("\n")
         data = [json.loads(obj) for obj in json_objects]
 
-        for obj in data:
-            print(obj.get("visitor_uuid"))
-
         print("File loaded Successfully")
 
     except FileNotFoundError:
@@ -91,7 +88,7 @@ def gui_main():
     root = Tk()
     ##decide a document to do operations
 
-    states = {"country": False, "continent": False, "views_verbose": False, "views_short": False, "reader": False}
+    states = {"country": False, "continent": False}
 
     root.title("F20SC-CW2 Data Analysis Tracker")
     root.geometry('900x600')
@@ -118,6 +115,7 @@ def gui_main():
         btn_back_to_load.grid_remove()
         btn_back_to_main.grid()
 
+    #Shows buttons to allow for user input
     def button_show():
         btn_choose_doc.grid()
         txt_doc.grid()
@@ -127,7 +125,7 @@ def gui_main():
     def toggle_flag(flag):
         states[flag] = True
 
-    #THESE NEED TESTED, PROBABLY NOT WORKING?
+    #naviagtes user back to main page allowing them to select a different button 
     def back_to_main():
         txt_doc.delete(1.0, END)
 
@@ -144,102 +142,91 @@ def gui_main():
         for x in states:
             states[x] = False
 
+    #navigates user back to initial page allowing for them to select a different file
     def back_to_load(root):
         root.withdraw() 
         gui_load_file() 
 
     ##BUTTONS TO BE USED FOR STUFF
+    #allows user to search for a certain document
     btn_view_document_country = Button(root, text = "Search visitors\nby country", font = ("Arial", 14), height =5,fg= "red", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
     btn_view_document_country.grid(row=2, column=0)
     
+    #allows user to search for a certain document
     btn_view_document_continent = Button(root, text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
     btn_view_document_continent.grid(row=2,column=1)
 
+    #Generates graph displaying what browsers have been used to view documents in the file (verbose)
     btn_views_by_browser_verbose = Button(root, text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
     btn_views_by_browser_verbose.grid(row=2, column=2)
 
+    #Generates graph displaying what browsers have been used to view documents in the file (short)
     btn_views_by_browser_short = Button(root, text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
     btn_views_by_browser_short.grid(row=2, column=3)                                                                                                            
 
-    btn_reader_profile = Button(root, text = "Top Viewers", font = ("Arial", 14) ,fg= "red", height =5, command=lambda: (button_hide(), toggle_flag("reader")))
+    #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
+    btn_reader_profile = Button(root, text = "Top Viewers", font = ("Arial", 14) ,fg= "red", height =5, command=lambda: (button_hide(), create_bar_chart((reader_profile(), "", "Top Readers", "UUID", "Time spent"), root)))
     btn_reader_profile.grid(row=2, column=4)   
 
+    #text box allowing for user input
     txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
     txt_doc.grid(row=0, column=0, sticky = 'nw', columnspan=5)
     txt_doc.grid_remove()
 
     #he is the fixer, he fixes things
     def the_fixer():
-        if (states.get("country") == True):
-            freq = search_country(txt_doc.get(1.0, END).strip())
-            print(freq)
+        #goes through states dictionary checking which flag has been changed if any
+        if (states.get("country") == True): #search for country has been selected
+            #fills out relevent data to then be passed on
+            freq = search_country(txt_doc.get(1.0, END).strip()) #calls search country method
             title = "Document viewed per country"
             x = "country"
             y = "freq"
-
-        elif (states.get("continent") == True):
-            freq = search_continent(txt_doc.get(1.0, END).strip())
+        elif (states.get("continent") == True):#search continent has been selected
+            #fills out relevent data to then be passed on
+            freq = search_continent(txt_doc.get(1.0, END).strip())#calls search continent method
             title = "Document viewed per continent"
             x = "continent"
             y = "freq"
-
-        elif (states.get("views_verbose") == True):
-            freq = views_by_browser_verbose()
-            title = "Views by Browser (Verbose)"
-            x = "browser"
-            y = "views"
-            create_bar_chart((freq, '', title, x, y), root)
-
-        elif (states.get("views_short") == True):
-            freq = views_by_browser_short()
-            title = "Views by browser (Short)"
-            x = "browser"
-            y = "views"
-            create_bar_chart((freq, "", title, x, y), root)
-
-        elif (states.get("reader") == True):
-            freq = reader_profile(txt_doc.get(1.0, END).strip())
-            title = "Top Viewers"
-            x = "User"
-            y = "Time spent"
-
         else:
             print("WARNING: SOMETHING HAS GONE HORRIBLY WRONG")
 
+        #returns a touple of all relevent information to then generate the chart
         return freq ,txt_doc.get(1.0, END).strip() ,title, x, y
     
+    #once this button is pressed it will check which flag has been raised and generate the appropriate graph
     btn_choose_doc = Button(root, text = "choose document", font = ("Arial", 14) ,fg= "red", command=lambda:create_bar_chart(the_fixer(), root), padx=20)
     btn_choose_doc.grid(row=0, column=1, columnspan=5, sticky='n')
     btn_choose_doc.grid_remove()
 
+    #once pressed directs user back to main page
     btn_back_to_main = Button(root, text = "back", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_main(), width=10, height=1)
     btn_back_to_main.grid(row=2, column=0, sticky='sw', columnspan=5)
     btn_back_to_main.grid_remove()
 
+    #once pressed directs user back to initial page to select a new file
     btn_back_to_load = Button(root, text = "back to file selection", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_load(root), width=10, height=1)
     btn_back_to_load.grid(row=2, column=0, sticky='sw')
 
     ##Creating bar charts
     def create_bar_chart(parameters, root):
-        freq, searched, title, x, y = parameters
-        fig = Figure(figsize=(root.winfo_screenwidth(),7), dpi= 80)
+        freq, searched, title, x, y = parameters #populates relevent variables using the parameters which is passed in as a 5 piece tuple
+        fig = Figure(figsize=(root.winfo_screenwidth(),7), dpi= 80) #configures size of bar chart
         ax = fig.add_subplot(111)
 
+        #fills in all relevent axis and information on bar chart with information passed through parameters
         ax.bar(freq.index, freq.values, color='skyblue')
         ax.set_title(f"{title}: {searched}")
         ax.set_xlabel(x)
         ax.set_ylabel(y)
         ax.tick_params(axis='x', rotation=45)
 
+        #dictates position of graph
         canvas = FigureCanvasTkAgg(fig, master=root)
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=1, column=2)
         
     root.mainloop()
-
-
-
-
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"   
@@ -288,14 +275,16 @@ def views_by_browser_short():
 
 ##REQ 4
 def reader_profile():
-    #creates list of all user ids found in the list allowing for duplicate entries
-    users = [user.get("visitor_uuid") for user in data] 
-
-    print(pd.Series(users).value_counts().head(10)) #DEBUGGING
+    #creates list of all user ids and time spent reading found in the list allowing for duplicate entries
+    user_time = [(obj.get("visitor_uuid"), obj.get("event_readtime", 0)) for obj in data]
+    #splits data up
+    df = pd.DataFrame(user_time, columns=["User ID", "Read Time"])
+    #finds the total time each user has spent reading files (by tallying any duplicates of their uuid)
+    agg = df.groupby("User ID")["Read Time"].sum()
+    
+    print(agg.sort_values(ascending=False).head(10))#DEBUGGING
     #returns users list tallied up with the frequency each user id has been found, will show the top 10 most seen users
-  
-    return pd.Series(users).value_counts().head(10)
-
+    return agg.sort_values(ascending=False).head(10)
 
 ##REQ 5
 #helper functions
