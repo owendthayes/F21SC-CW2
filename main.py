@@ -28,7 +28,7 @@ def gui_load_file():
     root.title("F20SC-CW2 Data Analysis Tracker")
     app_width = 700
     app_height = 300
-    root.geometry(f'{app_width}x{app_height}')
+    root.geometry(f'{app_width}x{app_height}+{100}+{100}')
     root.configure(bg="MediumPurple1")
 
     ##grid for managing placement of widgets
@@ -89,7 +89,7 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    also_like("111024191636-7ad435b4fa86478b8f662e219ffe7c6a")
+    also_like("140204164129-000000006fb0c837f2196059c285ef31")
     
     ##decide a document to do operations
 
