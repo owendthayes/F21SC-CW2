@@ -7,6 +7,7 @@ from pycountry_convert import country_alpha2_to_continent_code, convert_continen
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from collections import Counter
 
 # TO DO LIST
 # - REQUIREMENT 5 (ALSO LIKES)
@@ -20,13 +21,15 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # - CHECK SPEC AGAIN FOR ANYTHING MISSING
 
 
-
 ##GUI FOR CHOOSING INPUT FILE
 def gui_load_file():
     root = Tk()
     
     root.title("F20SC-CW2 Data Analysis Tracker")
-    root.geometry('900x600')
+    app_width = 700
+    app_height = 300
+    root.geometry(f'{app_width}x{app_height}')
+    root.configure(bg="MediumPurple1")
 
     ##grid for managing placement of widgets
     root.columnconfigure(0, weight = 1)
@@ -38,13 +41,13 @@ def gui_load_file():
     root.rowconfigure(2, weight = 1)   
 
     ##elements of main page
-    lbl_load_file = Label(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 30, text="enter file path")
+    lbl_load_file = Label(root, font = ("Arial", 14, 'bold') ,fg= "white", bg="MediumPurple1", height = 1, width = 30, text="Please enter the file path")
     lbl_load_file.grid(row=0, column=1, sticky = 's')
 
     txt_filePath = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 30   )
     txt_filePath.grid(row=1, column=1,)
 
-    btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c'), root))
+    btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", bg="lavender",command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c'), root))
     btn_choose_file.grid(row=1, column=2, sticky = 'w')
 
     root.mainloop()
@@ -67,17 +70,17 @@ def clicked_load_file(filePath, root):
 
     except FileNotFoundError:
         print(f"File not found: {FILE_NAME}")
-        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red", text="File can't be found, check you have entered the file path correctly.")
+        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red", bg = "white", text="File can't be found, check you have entered the file path correctly.")
         lbl_error_msg.grid(row=2, column=1, sticky = 'n')
 
     except json.JSONDecodeError as e:
         print(f"JSON Decode Error: {e}")
-        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red", text="Invalid JSON data. Please check your file and try again.")
+        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red",bg = "white", text="Invalid JSON data. Please check your file and try again.")
         lbl_error_msg.grid(row=2, column=1, sticky = 'n')
 
     except OSError as e:
         print(f"OS Error: {e}")
-        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red", text="An unknown error has occured.")
+        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red" ,bg = "white", text="An unknown error has occured.")
         lbl_error_msg.grid(row=2, column=1, sticky = 'n')
 
     else:
@@ -86,12 +89,15 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
+    also_like("111024191636-7ad435b4fa86478b8f662e219ffe7c6a")
+    
     ##decide a document to do operations
 
     states = {"country": False, "continent": False}
 
     root.title("F20SC-CW2 Data Analysis Tracker")
-    root.geometry('900x600')
+    root.geometry('1200x700')
+    root.configure(bg="MediumPurple1")
 
     ##grid for managing placement of widgets
     root.columnconfigure(0, weight = 1)
@@ -149,27 +155,27 @@ def gui_main():
 
     ##BUTTONS TO BE USED FOR STUFF
     #allows user to search for a certain document
-    btn_view_document_country = Button(root, text = "Search visitors\nby country", font = ("Arial", 14), height =5,fg= "red", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
-    btn_view_document_country.grid(row=2, column=0)
+    btn_view_document_country = Button(root, bg = "lavender", text = "Search visitors\nby country", font = ("Arial", 14), width = 15, height =6,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
+    btn_view_document_country.grid(row=0, column=1)
     
     #allows user to search for a certain document
-    btn_view_document_continent = Button(root, text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
-    btn_view_document_continent.grid(row=2,column=1)
+    btn_view_document_continent = Button(root, bg = "lavender", text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), width = 15, height =6 ,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
+    btn_view_document_continent.grid(row=0,column=3)
 
     #Generates graph displaying what browsers have been used to view documents in the file (verbose)
-    btn_views_by_browser_verbose = Button(root, text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
-    btn_views_by_browser_verbose.grid(row=2, column=2)
+    btn_views_by_browser_verbose = Button(root, bg = "lavender", text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), width = 15,  height =6 ,fg= "black", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
+    btn_views_by_browser_verbose.grid(row=1, column=0)
 
     #Generates graph displaying what browsers have been used to view documents in the file (short)
-    btn_views_by_browser_short = Button(root, text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
-    btn_views_by_browser_short.grid(row=2, column=3)                                                                                                            
+    btn_views_by_browser_short = Button(root, bg = "lavender",text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), width = 15, height =6 ,fg= "black", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
+    btn_views_by_browser_short.grid(row=1, column=2)                                                                                                            
 
     #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
-    btn_reader_profile = Button(root, text = "Top Viewers", font = ("Arial", 14) ,fg= "red", height =5, command=lambda: (button_hide(), create_bar_chart((reader_profile(), "", "Top Readers", "UUID", "Time spent"), root)))
-    btn_reader_profile.grid(row=2, column=4)   
+    btn_reader_profile = Button(root, bg="lavender", text = "Top Viewers", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: (button_hide(), create_bar_chart((reader_profile(), "", "Top Readers", "UUID", "Time spent"), root)))
+    btn_reader_profile.grid(row=1, column=4)   
 
     #text box allowing for user input
-    txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
+    txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20, bg = "lavender")
     txt_doc.grid(row=0, column=0, sticky = 'nw', columnspan=5)
     txt_doc.grid_remove()
 
@@ -195,17 +201,17 @@ def gui_main():
         return freq ,txt_doc.get(1.0, END).strip() ,title, x, y
     
     #once this button is pressed it will check which flag has been raised and generate the appropriate graph
-    btn_choose_doc = Button(root, text = "choose document", font = ("Arial", 14) ,fg= "red", command=lambda:create_bar_chart(the_fixer(), root), padx=20)
+    btn_choose_doc = Button(root, bg = "lavender", text = "choose document", font = ("Arial", 14) ,fg= "black", command=lambda:create_bar_chart(the_fixer(), root), padx=20)
     btn_choose_doc.grid(row=0, column=1, columnspan=5, sticky='n')
     btn_choose_doc.grid_remove()
 
     #once pressed directs user back to main page
-    btn_back_to_main = Button(root, text = "back", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_main(), width=10, height=1)
+    btn_back_to_main = Button(root, bg="lavender", text = "back", font = ("Arial", 14) ,fg= "black", command=lambda:back_to_main(), width=10, height=1)
     btn_back_to_main.grid(row=2, column=0, sticky='sw', columnspan=5)
     btn_back_to_main.grid_remove()
 
     #once pressed directs user back to initial page to select a new file
-    btn_back_to_load = Button(root, text = "back to file selection", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_load(root), width=10, height=1)
+    btn_back_to_load = Button(root, bg="lavender", text = "back to file selection", font = ("Arial", 14) ,fg= "black", command=lambda:back_to_load(root), width=16, height=1)
     btn_back_to_load.grid(row=2, column=0, sticky='sw')
 
     ##Creating bar charts
@@ -215,16 +221,19 @@ def gui_main():
         ax = fig.add_subplot(111)
 
         #fills in all relevent axis and information on bar chart with information passed through parameters
-        ax.bar(freq.index, freq.values, color='skyblue')
+        ax.bar(freq.index, freq.values, color='lavender')
         ax.set_title(f"{title}: {searched}")
         ax.set_xlabel(x)
         ax.set_ylabel(y)
-        ax.tick_params(axis='x', rotation=45)
+        ax.tick_params(axis='x', rotation=20)
+
+        #Increases bottom margin for graph (prevents x axis title being cut off)
+        fig.subplots_adjust(bottom=0.2)
 
         #dictates position of graph
         canvas = FigureCanvasTkAgg(fig, master=root)
         canvas_widget = canvas.get_tk_widget()
-        canvas_widget.grid(row=1, column=2)
+        canvas_widget.grid(row=1, column=2, sticky="nsew")
         
     root.mainloop()
 
@@ -276,7 +285,7 @@ def views_by_browser_short():
 ##REQ 4
 def reader_profile():
     #creates list of all user ids and time spent reading found in the list allowing for duplicate entries
-    user_time = [(obj.get("visitor_uuid"), obj.get("event_readtime", 0)) for obj in data]
+    user_time = [(obj.get("visitor_uuid"), obj.get("event_readtime", 0)) for obj in data if "event_readtime" in obj]
     #splits data up
     df = pd.DataFrame(user_time, columns=["User ID", "Read Time"])
     #finds the total time each user has spent reading files (by tallying any duplicates of their uuid)
@@ -290,44 +299,54 @@ def reader_profile():
 #helper functions
 def users_from_doc(documentID):
     #get list of users that have read the given document
-    users_viewed = []
-    for obj in data:
-        if obj.get("env_doc_id") is documentID:
-            users_viewed.append(obj.get("visitor_uuid"))
-    return users_viewed
+    users_viewed = [obj.get("visitor_uuid") for obj in data if obj.get("env_doc_id") == documentID]
+    # for obj in data:
+    #     if obj.get("env_doc_id") is documentID:
+    #         users_viewed.append(obj.get("visitor_uuid"))
+    return pd.Series(users_viewed).value_counts()
             
 def docs_from_users(visitorID):
     #get list of documents that user has read
     documents_viewed = []
     for obj in data:
-        if obj.get("visitor_uuid") is visitorID:
+        if obj.get("visitor_uuid") == visitorID:
             documents_viewed.append(obj.get("env_doc_id"))
     return documents_viewed
 
-#actual function
-#what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
-def also_like(documentID, visitorID, key):
-    #get list of "Liked documents"
-    users = users_from_doc(documentID)
+def sorting(dUUID, uUUID = None):
+    #find most popular and return in ascending order  
 
-    liked_docs = []
-    
-    all_read_docs = []
-    for user in users:
-        all_read_docs.append(docs_from_users(user))
     
     # doc_counts = Counter(all_read_docs)  # Count the occurrences of each document
     # sorted_docs = sorted(doc_counts.items(), key=lambda x: x[1], reverse=True)  # Sort by count in descending order
     
     # Optional: Extract only the document IDs, ignoring the counts
     # sorted_doc_ids = [doc for doc, count in sorted_docs]
-
-    return liked_docs
-    
+    return
     
 
-def sorting_function():
-    print("kys")
+#actual function
+#what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
+def also_like(documentID, visitorID = None):
+    #get list of "Liked documents"
+    print("1 - entered method")
+    users = users_from_doc(documentID) ##gets list of users who have read a specific document id
+    if visitorID:
+        docs = docs_from_users(visitorID) ##gets list of documents a specific reader has read
+    # print(users)
+    # for u in users.items(): #DEBUGGING
+    #     print(u)
 
+    print("2 - Lists populated")
+    #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
+    read_docs = [doc for curr_user in users.items() for doc in docs_from_users(curr_user[0])]
+    
+    # for u in read_docs.items(): #DEBUGGING
+    #     print("\n\n\n", u)
+    #read_docs = [docs_from_users(curr_user) for curr_user in users.items()] 
+    print("3 - top 10 list about to be generated")
+    print("4 - balls")
+    return pd.Series(read_docs).value_counts()
 
 gui_load_file()
+
