@@ -11,12 +11,13 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # TO DO LIST
 # - REQUIREMENT 5 (ALSO LIKES)
 # - REQUIREMENT 6 (ALSO LIKES GRAPH)
-# - LINK UP FUNCTIONALITY BU
+# - LINK UP FUNCTIONALITY BUTTONS
 # - COMMAND LINE TESTING (CHECK SPEC)
-# - IDK WE GOTTA CHECK THE SPEC MAKE SURE WE GOT IT COVERED
+# 
 # - VIDEO
 # - REPORT
 # - COMMENT CODE
+# - CHECK SPEC AGAIN FOR ANYTHING MISSING
 
 
 
@@ -108,17 +109,19 @@ def gui_main():
 
         
     #HIDES AND SHOWS BUTTONS ALLOWING FOR GRID TO BE CREATED AVOIDING FORMATTING ISSUES
-    def button_hiding_showing_helper():
+    def button_hide():
         btn_view_document_continent.grid_remove()
         btn_view_document_country.grid_remove()
         btn_views_by_browser_verbose.grid_remove()
         btn_views_by_browser_short.grid_remove()
-        btn5.grid_remove()
+        btn_reader_profile.grid_remove()
         btn_back_to_load.grid_remove()
+        btn_back_to_main.grid()
 
+    def button_show():
         btn_choose_doc.grid()
         txt_doc.grid()
-        btn_back_to_main.grid()
+
     
     #Helper method to flip the value of the associated key in the states dictionary
     def toggle_flag(flag):
@@ -135,31 +138,31 @@ def gui_main():
         btn_view_document_country.grid()
         btn_views_by_browser_verbose.grid()
         btn_views_by_browser_short.grid()
-        btn5.grid()
+        btn_reader_profile.grid()
         btn_back_to_load.grid()
 
         for x in states:
             states[x] = False
 
-    def back_to_load():
-        root.withdraw()
-        gui_load_file()
+    def back_to_load(root):
+        root.withdraw() 
+        gui_load_file() 
 
     ##BUTTONS TO BE USED FOR STUFF
-    btn_view_document_country = Button(root, text = "Search visitors\nby country", font = ("Arial", 14), height =5,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("country"))) #
+    btn_view_document_country = Button(root, text = "Search visitors\nby country", font = ("Arial", 14), height =5,fg= "red", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
     btn_view_document_country.grid(row=2, column=0)
     
-    btn_view_document_continent = Button(root, text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("continent")))
+    btn_view_document_continent = Button(root, text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
     btn_view_document_continent.grid(row=2,column=1)
 
-    btn_views_by_browser_verbose = Button(root, text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("continent")))
+    btn_views_by_browser_verbose = Button(root, text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
     btn_views_by_browser_verbose.grid(row=2, column=2)
 
-    btn_views_by_browser_short = Button(root, text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hiding_showing_helper(), toggle_flag("continent")))
-    btn_views_by_browser_short.grid(row=2, column=3)
+    btn_views_by_browser_short = Button(root, text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), height =5 ,fg= "red", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
+    btn_views_by_browser_short.grid(row=2, column=3)                                                                                                            
 
-    btn5 = Button(root, text = "owen is gay", font = ("Arial", 14) ,fg= "red", height =5, command=lambda: (button_hiding_showing_helper, toggle_flag("continent")))
-    btn5.grid(row=2, column=4)   
+    btn_reader_profile = Button(root, text = "Top Viewers", font = ("Arial", 14) ,fg= "red", height =5, command=lambda: (button_hide(), toggle_flag("reader")))
+    btn_reader_profile.grid(row=2, column=4)   
 
     txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
     txt_doc.grid(row=0, column=0, sticky = 'nw', columnspan=5)
@@ -181,16 +184,18 @@ def gui_main():
             y = "freq"
 
         elif (states.get("views_verbose") == True):
-            freq = views_by_browser_verbose(txt_doc.get(1.0, END).strip())
-            title = "Document viewed per country"
+            freq = views_by_browser_verbose()
+            title = "Views by Browser (Verbose)"
             x = "browser"
             y = "views"
+            create_bar_chart((freq, '', title, x, y), root)
 
         elif (states.get("views_short") == True):
-            freq = views_by_browser_short(txt_doc.get(1.0, END).strip())
-            title = "Document viewed per country"
+            freq = views_by_browser_short()
+            title = "Views by browser (Short)"
             x = "browser"
             y = "views"
+            create_bar_chart((freq, "", title, x, y), root)
 
         elif (states.get("reader") == True):
             freq = reader_profile(txt_doc.get(1.0, END).strip())
@@ -211,28 +216,30 @@ def gui_main():
     btn_back_to_main.grid(row=2, column=0, sticky='sw', columnspan=5)
     btn_back_to_main.grid_remove()
 
-    btn_back_to_load = Button(root, text = "back to file selection", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_load, width=10, height=1)
+    btn_back_to_load = Button(root, text = "back to file selection", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_load(root), width=10, height=1)
     btn_back_to_load.grid(row=2, column=0, sticky='sw')
 
+    ##Creating bar charts
+    def create_bar_chart(parameters, root):
+        freq, searched, title, x, y = parameters
+        fig = Figure(figsize=(root.winfo_screenwidth(),7), dpi= 80)
+        ax = fig.add_subplot(111)
+
+        ax.bar(freq.index, freq.values, color='skyblue')
+        ax.set_title(f"{title}: {searched}")
+        ax.set_xlabel(x)
+        ax.set_ylabel(y)
+        ax.tick_params(axis='x', rotation=45)
+
+        canvas = FigureCanvasTkAgg(fig, master=root)
+        canvas_widget = canvas.get_tk_widget()
+        canvas_widget.grid(row=1, column=2)
+        
     root.mainloop()
 
 
 
-##CHARTS ARENT DISPLAYING IDK WHY
-def create_bar_chart(parameters, root):
-    freq, searched, title, x, y = parameters
-    fig = Figure(figsize=(root.winfo_screenwidth(),7), dpi= 80)
-    ax = fig.add_subplot(111)
 
-    ax.bar(freq.index, freq.values, color='skyblue')
-    ax.set_title(f"{title}: {searched}")
-    ax.set_xlabel(x)
-    ax.set_ylabel(y)
-    ax.tick_params(axis='x', rotation=45)
-
-    canvas = FigureCanvasTkAgg(fig, master=root)
-    canvas_widget = canvas.get_tk_widget()
-    canvas_widget.grid(row=1, column=2)
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"   
@@ -310,33 +317,28 @@ def docs_from_users(visitorID):
 
 #actual function
 #what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
-# def also_like(documentID, visitorID, key):
-#     #get list of "Liked documents"
-#     users = users_from_doc(documentID)
+def also_like(documentID, visitorID, key):
+    #get list of "Liked documents"
+    users = users_from_doc(documentID)
 
-#     liked_docs = []
+    liked_docs = []
     
-#     all_read_docs = []
-#     for user in users:
-#         all_read_docs.append(docs_from_users(user))
+    all_read_docs = []
+    for user in users:
+        all_read_docs.append(docs_from_users(user))
     
-#     # doc_counts = Counter(all_read_docs)  # Count the occurrences of each document
-#     # sorted_docs = sorted(doc_counts.items(), key=lambda x: x[1], reverse=True)  # Sort by count in descending order
+    # doc_counts = Counter(all_read_docs)  # Count the occurrences of each document
+    # sorted_docs = sorted(doc_counts.items(), key=lambda x: x[1], reverse=True)  # Sort by count in descending order
     
-#     # Optional: Extract only the document IDs, ignoring the counts
-#     # sorted_doc_ids = [doc for doc, count in sorted_docs]
+    # Optional: Extract only the document IDs, ignoring the counts
+    # sorted_doc_ids = [doc for doc, count in sorted_docs]
 
-#     return liked_docs
+    return liked_docs
     
     
 
 def sorting_function():
     print("kys")
 
-
-
-#search_continent("140228202800-6ef39a241f35301a9a42cd0ed21e5fb0")
-#views_by_browser()
-#reader_profile()
 
 gui_load_file()
