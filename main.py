@@ -11,17 +11,18 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # TO DO LIST
 # - REQUIREMENT 5 (ALSO LIKES)
 # - REQUIREMENT 6 (ALSO LIKES GRAPH)
-# - GET RID OF HARD CODED SHIT
+# - LINK UP FUNCTIONALITY BU
 # - COMMAND LINE TESTING (CHECK SPEC)
 # - IDK WE GOTTA CHECK THE SPEC MAKE SURE WE GOT IT COVERED
 # - VIDEO
 # - REPORT
 # - COMMENT CODE
 
-root = Tk()
+
 
 ##GUI FOR CHOOSING INPUT FILE
 def gui_load_file():
+    root = Tk()
     
     root.title("F20SC-CW2 Data Analysis Tracker")
     root.geometry('900x600')
@@ -42,13 +43,13 @@ def gui_load_file():
     txt_filePath = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 30   )
     txt_filePath.grid(row=1, column=1,)
 
-    btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c')))
+    btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c'), root))
     btn_choose_file.grid(row=1, column=2, sticky = 'w')
 
     root.mainloop()
 
 ##FUNCTION FOR LOADING FILE FROM INPUTTED FILE PATH
-def clicked_load_file(filePath):
+def clicked_load_file(filePath, root):
     global data    ##this is the parsed json data
 
     FILE_NAME = filePath.strip()
@@ -108,7 +109,6 @@ def gui_main():
         
     #HIDES AND SHOWS BUTTONS ALLOWING FOR GRID TO BE CREATED AVOIDING FORMATTING ISSUES
     def button_hiding_showing_helper():
-        print("isis")
         btn_view_document_continent.grid_remove()
         btn_view_document_country.grid_remove()
         btn_views_by_browser_verbose.grid_remove()
@@ -123,10 +123,14 @@ def gui_main():
     #Helper method to flip the value of the associated key in the states dictionary
     def toggle_flag(flag):
         states[flag] = True
-        print(f"Cunt Cunt Cunt: {states['country']}")
 
     #THESE NEED TESTED, PROBABLY NOT WORKING?
     def back_to_main():
+        txt_doc.delete(1.0, END)
+
+        for widget in root.grid_slaves():
+           widget.grid_remove()
+
         btn_view_document_continent.grid()
         btn_view_document_country.grid()
         btn_views_by_browser_verbose.grid()
@@ -134,9 +138,8 @@ def gui_main():
         btn5.grid()
         btn_back_to_load.grid()
 
-        btn_choose_doc.grid_remove()
-        txt_doc.grid_remove()
-        btn_back_to_main.grid_remove()
+        for x in states:
+            states[x] = False
 
     def back_to_load():
         root.withdraw()
@@ -164,9 +167,7 @@ def gui_main():
 
     #he is the fixer, he fixes things
     def the_fixer():
-        print("boo")
         if (states.get("country") == True):
-            print("bastard") #i agree
             freq = search_country(txt_doc.get(1.0, END).strip())
             print(freq)
             title = "Document viewed per country"
@@ -200,15 +201,13 @@ def gui_main():
         else:
             print("WARNING: SOMETHING HAS GONE HORRIBLY WRONG")
 
-        print("mongoloid", freq)
-
         return freq ,txt_doc.get(1.0, END).strip() ,title, x, y
     
     btn_choose_doc = Button(root, text = "choose document", font = ("Arial", 14) ,fg= "red", command=lambda:create_bar_chart(the_fixer(), root), padx=20)
     btn_choose_doc.grid(row=0, column=1, columnspan=5, sticky='n')
     btn_choose_doc.grid_remove()
 
-    btn_back_to_main = Button(root, text = "back", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_main, width=10, height=1)
+    btn_back_to_main = Button(root, text = "back", font = ("Arial", 14) ,fg= "red", command=lambda:back_to_main(), width=10, height=1)
     btn_back_to_main.grid(row=2, column=0, sticky='sw', columnspan=5)
     btn_back_to_main.grid_remove()
 
@@ -222,7 +221,7 @@ def gui_main():
 ##CHARTS ARENT DISPLAYING IDK WHY
 def create_bar_chart(parameters, root):
     freq, searched, title, x, y = parameters
-    fig = Figure(figsize=(root.winfo_screenwidth(),5), dpi= 80)
+    fig = Figure(figsize=(root.winfo_screenwidth(),7), dpi= 80)
     ax = fig.add_subplot(111)
 
     ax.bar(freq.index, freq.values, color='skyblue')
@@ -237,10 +236,8 @@ def create_bar_chart(parameters, root):
 
 ## REQ 2
 def search_country(document):# "subject_doc_id"   
-    print("penis")
     #creates list of all countries which have viewed the document
     countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
-
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
 
 def search_continent(document):
