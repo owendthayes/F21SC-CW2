@@ -1,5 +1,6 @@
 import json #for managing files https://docs.python.org/3/library/json.html
 from tkinter import *  #for creating a gui https://docs.python.org/3/library/tkinter.html
+from tkinter import messagebox
 import graphviz.dot
 import pandas as pd #for data manipulation and managing big data https://pandas.pydata.org/
 import pycountry #allows the ability to get country codes https://pypi.org/project/pycountry/
@@ -57,6 +58,12 @@ def gui_load_file():
     btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", bg="lavender",command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c'), root))
     btn_choose_file.grid(row=1, column=2, sticky = 'w')
 
+
+    def on_closing():
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_closing)
     root.mainloop()
 
 ##FUNCTION FOR LOADING FILE FROM INPUTTED FILE PATH
@@ -316,6 +323,11 @@ def gui_main():
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=1, column=2, sticky="nsew")
         
+    def on_closing():
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_closing)
     root.mainloop()
 
 ## REQ 2
