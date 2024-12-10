@@ -58,11 +58,11 @@ def gui_load_file():
     btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", bg="lavender",command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c'), root))
     btn_choose_file.grid(row=1, column=2, sticky = 'w')
 
-
     def on_closing():
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.quit()
             root.destroy()
-
+            
     root.protocol("WM_DELETE_WINDOW", on_closing)
     root.mainloop()
 
@@ -98,7 +98,7 @@ def clicked_load_file(filePath, root):
         lbl_error_msg.grid(row=2, column=1, sticky = 'nw')
 
     else:
-        root.withdraw()
+        root.destroy()
         gui_main()
         
 def gui_main():
@@ -325,6 +325,7 @@ def gui_main():
         
     def on_closing():
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            root.quit()
             root.destroy()
 
     root.protocol("WM_DELETE_WINDOW", on_closing)
