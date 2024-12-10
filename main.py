@@ -6,6 +6,7 @@ from pycountry_convert import country_alpha2_to_continent_code, convert_continen
 import matplotlib #for creating graphs https://matplotlib.org/
 from matplotlib.figure import Figure #for creating graphs https://matplotlib.org/
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #for creating graphs https://matplotlib.org/
+import graphviz
 # TO DO LIST
 # - REQUIREMENT 5 (ALSO LIKES)
 # - REQUIREMENT 6 (ALSO LIKES GRAPH)
