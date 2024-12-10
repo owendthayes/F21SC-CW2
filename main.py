@@ -471,7 +471,8 @@ def also_likes_graph(documentID, userID):
             else:
                 dot.node(d, d[-4:]) #create regular node 
 
-        dot.render('graph', view=True) #creates graph
+        dot.render('graph', view=False, format = 'ps2') #creates graph in PS format
+        dot.render('graph', view=True, format = 'pdf') #creates graph in PDF format
     except:
         #If no other users have viewed the graph, inform the user.
         dot.node('A', 'No other users have viewed this document yet.', style = 'filled', fillcolor='red')
