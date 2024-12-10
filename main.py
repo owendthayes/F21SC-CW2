@@ -97,7 +97,7 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    also_like("140206010823-b14c9d966be950314215c17923a04af7")
+    also_like( "140206010823-b14c9d966be950314215c17923a04af7", "f08fc48b49f0e1be")
     
     states = {"country": False, "continent": False}
 
@@ -350,58 +350,34 @@ def users_from_doc(documentID):
 def docs_from_users(visitorID):
     #get list of documents that user has read
     documents_viewed = [obj.get("env_doc_id") for obj in data if obj.get("visitor_uuid") == visitorID]
-
-    # documents_viewed = []
-    # for obj in data:
-    #     if obj.get("visitor_uuid") == visitorID:
-    #         documents_viewed.append(obj.get("env_doc_id"))
     return documents_viewed
 
 #actual function
 #what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
-def also_like(documentID, visitorID = None):
+def also_like(documentID = None, visitorID = None):
     #get list of "Liked documents"
-    print("1 - entered method")
-    users = users_from_doc(documentID) ##gets list of users who have read a specific document id
+    if documentID:
+        users = users_from_doc(documentID) ##gets list of users who have read a specific document id
+        
     if visitorID:
-        docs = docs_from_users(visitorID) ##gets list of documents a specific reader has read
-    #for d in docs.items():
-    #    print(d)
-    print(users)
-    print("2 - Lists populated")
-    #user -> evry document -> every user- > top 10 docs
-    # user_docs = []
-    # for curr_doc in docs.items():
-    #     x = users_from_doc(curr_doc[0])
-    #     for user in x:
-    #         user_docs.append(user)
-            
-    # print(user_docs)
+        docs = list(set(docs_from_users(visitorID))) ##gets list of documents a specific reader has read
 
-    # user_docs = pd.Series(user_docs).value_counts()   
-    # for d in user_docs.items():
-    #     print(d)
-    
-    print("cock")    
-    print("3 - top 10 list about to be generated")       
-    #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
-
-    read_docs = []
-    for curr in users:
-        x = docs_from_users(curr)
-        for doc in x:
-            if (doc != documentID):
-                read_docs.append(doc)
-
-    #read_docs = [doc for curr_user in users.items() for doc in docs_from_users(curr_user[0])] #WHEN NO VISITOR ID 
-    print("read docs before series ", read_docs)
-    read_docs = pd.Series(read_docs).value_counts().head(10)
-    print("read docs after series ", read_docs)
-    #read_docs = pd.Series(read_docs).value_counts()
-    # for u in read_docs: #DEBUGGING
-    #      print("\n\n\n", u)
-    print("4 - balls")
-    return pd.Series(read_docs).value_counts()
+    if documentID and visitorID:
+        #user -> evry document -> every user- > top 10 docs
+        user_docs = []
+        for curr in docs: #current document in list of documents
+            x = users_from_doc(curr) #finds all users who have viewed this document
+            for user in x: #current user who has viewed this doc in the list of users
+                if user != visitorID: #not the visitor id
+                    user_docs.append(user) #add to list
+            common_users = list(set(user_docs)) #contains all other users which have read a document in common (no duplicates)
+        #finds all documents the common_users have read and gets the frequency each document has been viewed
+        user_docs_result = [doc for curr_user in common_users for doc in docs_from_users(curr_user)]
+        return pd.Series(user_docs_result).value_counts().head(10) #COMPLETE
+    else:
+        #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
+        read_docs = [doc for curr in users for doc in docs_from_users(curr) if doc != documentID] #WHEN NO VISITOR ID
+        return pd.Series(read_docs).value_counts().head(10) #COMPLETE
 
 gui_load_file()
 
