@@ -12,7 +12,6 @@ import graphviz
 
 # TO DO LIST
 # - Video demo
-# - Final check of spec
 # - standalone exe
 
 ##GUI FOR CHOOSING INPUT FILE
