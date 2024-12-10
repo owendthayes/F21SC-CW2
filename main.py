@@ -10,7 +10,6 @@ from matplotlib.figure import Figure #for creating graphs https://matplotlib.org
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #for creating graphs https://matplotlib.org/
 import graphviz
 # TO DO LIST
-# - LINK UP FUNCTIONALITY BUTTONS FOR REQ 5 AND 6
 # - COMMAND LINE TESTING (CHECK SPEC)
 # 
 # - VIDEO
@@ -18,7 +17,6 @@ import graphviz
 #
 # - COMMENT CODE
 # - CHECK SPEC AGAIN FOR ANYTHING MISSING
-# - doesnt close when u click x
 
 
 ##GUI FOR CHOOSING INPUT FILE
@@ -149,7 +147,7 @@ def gui_main():
     #Shows buttons to allow for user input
     def button_show():
         btn_choose_doc.grid()
-        txt_doc.grid(row=0, column=0,sticky='nw')
+        txt_doc.grid(row=0, column=0)
  
     
     #Helper method to flip the value of the associated key in the states dictionary
@@ -193,27 +191,27 @@ def gui_main():
 
     ##BUTTONS TO BE USED FOR STUFF
     #allows user to search for a certain document
-    btn_view_document_country = Button(root, bg = "lavender", text = "Search visitors\nby country", font = ("Arial", 14), width = 15, height =6,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
+    btn_view_document_country = Button(root, bg = "lavender", text = "Search visitors\nby country", font = ("Arial", 18), width = 20, height = 6,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
     btn_view_document_country.grid(row=0, column=0)
     
     #allows user to search for a certain document
-    btn_view_document_continent = Button(root, bg = "lavender", text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), width = 15, height =6 ,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
+    btn_view_document_continent = Button(root, bg = "lavender", text = "Search document\nvisitors by\ncontinent", font = ("Arial", 18), width = 20, height = 6,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
     btn_view_document_continent.grid(row=0,column=2)
 
     #Generates graph displaying what browsers have been used to view documents in the file (verbose)
-    btn_views_by_browser_verbose = Button(root, bg = "lavender", text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), width = 15,  height =6 ,fg= "black", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
+    btn_views_by_browser_verbose = Button(root, bg = "lavender", text = "Search document\nviews by browser\n(long)", font = ("Arial", 18), width = 20,  height = 6 ,fg= "black", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
     btn_views_by_browser_verbose.grid(row=0, column=4)
 
     #Generates graph displaying what browsers have been used to view documents in the file (short)
-    btn_views_by_browser_short = Button(root, bg = "lavender",text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), width = 15, height =6 ,fg= "black", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
+    btn_views_by_browser_short = Button(root, bg = "lavender",text = "Search document\nviews by browser\n(short)", font = ("Arial", 18), width = 20, height = 6 ,fg= "black", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
     btn_views_by_browser_short.grid(row=1, column=0)                                                                                                            
 
     #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
-    btn_reader_profile = Button(root, bg="lavender", text = "Top Viewers", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: (button_hide(), create_bar_chart((reader_profile(), "", "Top Readers", "UUID", "Time spent"), root)))
+    btn_reader_profile = Button(root, bg="lavender", text = "Top Viewers", font = ("Arial", 18) ,fg= "black", height = 6, width = 20, command=lambda: (button_hide(), create_bar_chart((reader_profile(), "", "Top Readers", "UUID", "Time spent"), root)))
     btn_reader_profile.grid(row=1, column=2)   
 
     #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
-    btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: prep_also_likes())
+    btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 18) ,fg= "black", height = 6, width = 20, command=lambda: prep_also_likes())
     btn_also_likes.grid(row=1, column=4) 
 
     lbl_doc_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="Document ID:")
@@ -229,30 +227,30 @@ def gui_main():
     lbl_top10list.grid_remove()
 
     def also_likes_helper(doc, user):
-        top10list = also_like(doc, user).to_dict()
-        formattedlist = ""
-        formattedlines = []
+        top10list = also_like(doc,user)
+        if not top10list.empty:
+            top10list = also_like(doc, user).to_dict()
+            formattedlist = ""
+            formattedlines = []
 
-        txt_doc.grid_remove()
-        txt_userID.grid_remove()
-        lbl_user_id.grid_remove()
-        lbl_doc_id.grid_remove()
-        btn_also_likes_go.grid_remove()
-        lbl_top10list.grid(row=1, column=2)
-        lbl_top10title.grid(row=0, column=2)
+            txt_doc.grid_remove()
+            txt_userID.grid_remove()
+            lbl_user_id.grid_remove()
+            lbl_doc_id.grid_remove()
+            btn_also_likes_go.grid_remove()
+            lbl_top10list.grid(row=1, column=2)
+            lbl_top10title.grid(row=0, column=2)
 
-        i = 0
-        formattedText = ""
-        for row in top10list:
-            key, value = list(top10list.items())[i]
-            formattedText += f"Document UUID: {key} - Number of Readers:  {value}\n"
-            i+=1
+            i = 0
+            formattedText = ""
+            for row in top10list:
+                key, value = list(top10list.items())[i]
+                formattedText += f"Document UUID: {key} - Number of Readers:  {value}\n"
+                i+=1
 
-        lbl_top10list.config(text=formattedText)
-
-
-
-
+            lbl_top10list.config(text=formattedText)
+        else:
+            lbl_top10list.config(text="No other users have read this document.")
 
     btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: (also_likes_helper(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip()), also_likes_graph(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip())))
     btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')                                                                                 #also_like(txt_doc text, txt_userID text)
@@ -263,8 +261,8 @@ def gui_main():
     txt_userID.grid_remove()
 
     #text box allowing for user input
-    txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20, bg = "lavender")
-    txt_doc.grid(row=0, column=0, sticky = 'nw', columnspan=5)
+    txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
+    txt_doc.grid(row=0, column=0, columnspan=5, sticky = 'w')
     txt_doc.grid_remove()
 
     #he is the fixer, he fixes things
@@ -290,16 +288,16 @@ def gui_main():
     
     #once this button is pressed it will check which flag has been raised and generate the appropriate graph
     btn_choose_doc = Button(root, bg = "lavender", text = "choose document", font = ("Arial", 14) ,fg= "black", command=lambda:create_bar_chart(the_fixer(), root), padx=20)
-    btn_choose_doc.grid(row=0, column=1, columnspan=5, sticky='n')
+    btn_choose_doc.grid(row=0, column=1, columnspan=5)
     btn_choose_doc.grid_remove()
 
     #once pressed directs user back to main page
-    btn_back_to_main = Button(root, bg="lavender", text = "back", font = ("Arial", 14) ,fg= "black", command=lambda:back_to_main(), width=10, height=1)
+    btn_back_to_main = Button(root, bg="lavender", text = "back", font = ("Arial", 14) ,fg= "black", command=lambda:back_to_main(), width=20, height=1)
     btn_back_to_main.grid(row=2, column=0, sticky='sw', columnspan=5)
     btn_back_to_main.grid_remove()
 
     #once pressed directs user back to initial page to select a new file
-    btn_back_to_load = Button(root, bg="lavender", text = "back to file selection", font = ("Arial", 14) ,fg= "black", command=lambda:back_to_load(root), width=16, height=1)
+    btn_back_to_load = Button(root, bg="lavender", text = "back to file selection", font = ("Arial", 14) ,fg= "black", command=lambda:back_to_load(root), width=20, height=1)
     btn_back_to_load.grid(row=2, column=0, sticky='sw')
 
     ##Creating bar charts
@@ -332,14 +330,14 @@ def gui_main():
     root.mainloop()
 
 ## REQ 2
-def search_country(document):# "subject_doc_id"   
+def search_country(document):# "env_doc_id"   
     #creates list of all countries which have viewed the document
-    countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)] 
+    countries = [obj.get("visitor_country") for obj in data if (obj.get("env_doc_id") == document)] 
     return pd.Series(countries).value_counts() #returns a tallied up version of the list showing the country and frequency of visitors
 
 def search_continent(document):
     #creates list of all countries which have viewed the document
-    countries = [obj.get("visitor_country") for obj in data if (obj.get("subject_doc_id") == document)]
+    countries = [obj.get("visitor_country") for obj in data if (obj.get("env_doc_id") == document)]
     #creates list of all continents included in the list of user countries
     continents = [convert_continent_code_to_continent_name(country_alpha2_to_continent_code(country)) for country in countries]
     return pd.Series(continents).value_counts() #returns a tallied up version of the list showing the continents and frequency of visitors
@@ -462,10 +460,10 @@ def also_likes_graph(documentID, userID):
 
         dot.render('graph', view=True)
     except:
-        #TELL THE USER NOL OTHER CUNT HAS REWAD THIS STUPID BULLSHIT BHEFORE.
-        print(f"JSON Decode Error: {e}")
-        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red",bg = "white", text="Invalid JSON data. Please check your file and try again.")
-        lbl_error_msg.grid(row=2, column=1, sticky = 'n')
+        #If no other users have viewed the graph, inform the user.
+        dot.node('A', 'No other users have viewed this document yet.', style = 'filled', fillcolor='red')
+        dot.render('graph', view=True)
+        return
     return
 
 gui_load_file()
