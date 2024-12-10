@@ -96,8 +96,8 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    also_likes_graph("130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb","745409913574d4c6")
-    also_like( "140206010823-b14c9d966be950314215c17923a04af7", "f08fc48b49f0e1be")
+    #also_likes_graph("130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb","745409913574d4c6")
+    #also_like( "140206010823-b14c9d966be950314215c17923a04af7", "745409913574d4c6")
     
     states = {"country": False, "continent": False}
 
@@ -210,8 +210,8 @@ def gui_main():
     btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: prep_also_likes())
     btn_also_likes.grid(row=1, column=4) 
 
-    btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: also_like(txt_doc.get(1.0, END), txt_userID.get(1.0, END)))
-    btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')
+    btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: also_like(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip()))
+    btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')                                                                                 #also_like(txt_doc text, txt_userID text)
     btn_also_likes_go.grid_remove()
 
     txt_userID = Text(root, font = ("Arial", 14), width = 20, height = 1, fg = "black")
@@ -352,15 +352,18 @@ def docs_from_users(visitorID):
 
 #actual function
 #what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
-def also_like(documentID = None, visitorID = None):
+def also_like(documentID, visitorID):
+    print("DocID: ", documentID)
+    print("UserID: ", visitorID)
+    
     #get list of "Liked documents"
     if documentID:
         users = users_from_doc(documentID) ##gets list of users who have read a specific document id
         
-    if visitorID:
+    if visitorID != "":
         docs = list(set(docs_from_users(visitorID))) ##gets list of documents a specific reader has read
 
-    if documentID and visitorID:
+    if documentID and visitorID != "":
         #user -> evry document -> every user- > top 10 docs
         user_docs = []
         for curr in docs: #current document in list of documents
@@ -368,13 +371,16 @@ def also_like(documentID = None, visitorID = None):
             for user in x: #current user who has viewed this doc in the list of users
                 if user != visitorID: #not the visitor id
                     user_docs.append(user) #add to list
+                    print(user_docs)
             common_users = list(set(user_docs)) #contains all other users which have read a document in common (no duplicates)
         #finds all documents the common_users have read and gets the frequency each document has been viewed
         user_docs_result = [doc for curr_user in common_users for doc in docs_from_users(curr_user)]
+        print(pd.Series(user_docs_result).value_counts().head(10)) #COMPLETE
         return pd.Series(user_docs_result).value_counts().head(10) #COMPLETE
     else:
         #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
         read_docs = [doc for curr in users for doc in docs_from_users(curr) if doc != documentID] #WHEN NO VISITOR ID
+        print("Series: ", pd.Series(read_docs).value_counts().head(10))
         return pd.Series(read_docs).value_counts().head(10) #COMPLETE
 
 #REQ 6
