@@ -96,7 +96,7 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    #also_likes_graph("130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb","745409913574d4c6")
+    #also_likes_graph("140204164129-000000006fb0c837f2196059c285ef31","96141588c97c982e")
     #also_like( "140206010823-b14c9d966be950314215c17923a04af7", "745409913574d4c6")
     
     states = {"country": False, "continent": False}
@@ -152,6 +152,7 @@ def gui_main():
     #naviagtes user back to main page allowing them to select a different button 
     def back_to_main():
         txt_doc.delete(1.0, END)
+        txt_userID.delete(1.0, END)
 
         for widget in root.grid_slaves():
            widget.grid_remove()
@@ -175,11 +176,9 @@ def gui_main():
     def prep_also_likes():
         button_hide()
         
-        lbl_doc_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="Document ID:")
         lbl_doc_id.grid(row=0, column=0, sticky='se')
         txt_doc.grid(row=0, column=2, sticky = 'sw')
 
-        lbl_user_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
         lbl_user_id.grid(row=1, column=0, sticky='e')
         txt_userID.grid(row=1, column=2, sticky = 'w')
 
@@ -210,7 +209,45 @@ def gui_main():
     btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: prep_also_likes())
     btn_also_likes.grid(row=1, column=4) 
 
-    btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: also_like(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip()))
+    lbl_doc_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="Document ID:")
+    lbl_doc_id.grid_remove()
+
+    lbl_user_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
+    lbl_doc_id.grid_remove()
+
+    lbl_top10list = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
+    lbl_top10list.grid_remove()
+
+    lbl_top10title = Label(root, font = ("Arial", 18) ,fg= "white" ,bg = "MediumPurple1", text="Top 10 Documents you may also like!")
+    lbl_top10list.grid_remove()
+
+    def also_likes_helper(doc, user):
+        top10list = also_like(doc, user).to_dict()
+        formattedlist = ""
+        formattedlines = []
+
+        txt_doc.grid_remove()
+        txt_userID.grid_remove()
+        lbl_user_id.grid_remove()
+        lbl_doc_id.grid_remove()
+        btn_also_likes_go.grid_remove()
+        lbl_top10list.grid(row=1, column=2)
+        lbl_top10title.grid(row=0, column=2)
+
+        i = 0
+        formattedText = ""
+        for row in top10list:
+            key, value = list(top10list.items())[i]
+            formattedText += f"Document UUID: {key} - Number of Readers:  {value}\n"
+            i+=1
+
+        lbl_top10list.config(text=formattedText)
+
+
+
+
+
+    btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: (also_likes_helper(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip()), also_likes_graph(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip())))
     btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')                                                                                 #also_like(txt_doc text, txt_userID text)
     btn_also_likes_go.grid_remove()
 
@@ -371,11 +408,10 @@ def also_like(documentID, visitorID):
             for user in x: #current user who has viewed this doc in the list of users
                 if user != visitorID: #not the visitor id
                     user_docs.append(user) #add to list
-                    print(user_docs)
             common_users = list(set(user_docs)) #contains all other users which have read a document in common (no duplicates)
         #finds all documents the common_users have read and gets the frequency each document has been viewed
         user_docs_result = [doc for curr_user in common_users for doc in docs_from_users(curr_user)]
-        print(pd.Series(user_docs_result).value_counts().head(10)) #COMPLETE
+        print("PRinting this piece", pd.Series(user_docs_result).value_counts().head(10)) #COMPLETE
         return pd.Series(user_docs_result).value_counts().head(10) #COMPLETE
     else:
         #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
@@ -385,48 +421,38 @@ def also_like(documentID, visitorID):
 
 #REQ 6
 def also_likes_graph(documentID, userID):
+    print("documentID: ", documentID, type(documentID))
+    print("userID: ", userID, type(userID))
     dot = graphviz.Digraph()
 
     # 3 - make edges between users and documents they have read!!!
+    try:
+        read_docs = []
+        users = users_from_doc(documentID) # all users
+        for u in users:
+            if u == userID:
+                dot.node(u,u[-4:], style='filled', fillcolor='purple', shape='box')
+            else:
+                dot.node(u, u[-4:], shape='box')    
 
-    read_docs = []
-    users = users_from_doc(documentID) # all users
-    for u in users:
-        if u == userID:
-            dot.node(u,u[-4:], style='filled', fillcolor='purple', shape='box')
-        else:
-            dot.node(u, u[-4:], shape='box')    
-            
-        tempDocs = docs_from_users(u)
-        for td in set(tempDocs):
-            read_docs.append(td)
-            dot.edge(u, td)
+            tempDocs = docs_from_users(u) #dont edge me hah
+            for td in set(tempDocs):
+                read_docs.append(td)
+                dot.edge(u, td)
         
-    # read_docs = set(read_docs)
-    print(read_docs)
-    for d in read_docs:
-        if d == documentID:
-            dot.node(d, d[-4:], style='filled', fillcolor='purple')
-        else:
-            dot.node(d, d[-4:])
+        # read_docs = set(read_docs)
+        for d in read_docs:
+            if d == documentID:
+                dot.node(d, d[-4:], style='filled', fillcolor='purple')
+            else:
+                dot.node(d, d[-4:])
 
-    print(read_docs)      
-
-    #iterate through all rel users, get docs they have read
-    #make edge between user and doc
-    # user list -> find all docs read (use docs_from_users()) -> where user x has read doc y -> make edge
-    
-    #need userid and docid prefreably in tuple
-    #iterate through
-    
-    # dot.node('A', 'Node A')
-    # dot.node('B', 'Node B')
-
-    # dot.edge('A', 'B', 'Edge 1')
-    # dot.edge('B', 'A', 'Edge 2')
-
-    dot.render('graph', view=True)
-
+        dot.render('graph', view=True)
+    except:
+        #TELL THE USER NOL OTHER CUNT HAS REWAD THIS STUPID BULLSHIT BHEFORE.
+        print(f"JSON Decode Error: {e}")
+        lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red",bg = "white", text="Invalid JSON data. Please check your file and try again.")
+        lbl_error_msg.grid(row=2, column=1, sticky = 'n')
     return
 
 gui_load_file()
