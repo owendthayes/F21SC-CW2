@@ -1,5 +1,6 @@
 import json #for managing files https://docs.python.org/3/library/json.html
 from tkinter import *  #for creating a gui https://docs.python.org/3/library/tkinter.html
+import graphviz.dot
 import pandas as pd #for data manipulation and managing big data https://pandas.pydata.org/
 import pycountry #allows the ability to get country codes https://pypi.org/project/pycountry/
 from pycountry_convert import country_alpha2_to_continent_code, convert_continent_code_to_continent_name #allows the ability to get country codes https://pypi.org/project/pycountry/
@@ -8,15 +9,15 @@ from matplotlib.figure import Figure #for creating graphs https://matplotlib.org
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #for creating graphs https://matplotlib.org/
 import graphviz
 # TO DO LIST
-# - REQUIREMENT 5 (ALSO LIKES)
-# - REQUIREMENT 6 (ALSO LIKES GRAPH)
-# - LINK UP FUNCTIONALITY BUTTONS
+# - LINK UP FUNCTIONALITY BUTTONS FOR REQ 5 AND 6
 # - COMMAND LINE TESTING (CHECK SPEC)
 # 
 # - VIDEO
 # - REPORT
+#
 # - COMMENT CODE
 # - CHECK SPEC AGAIN FOR ANYTHING MISSING
+# - doesnt close when u click x
 
 
 ##GUI FOR CHOOSING INPUT FILE
@@ -87,7 +88,7 @@ def clicked_load_file(filePath, root):
     except OSError as e:
         print(f"OS Error: {e}")
         lbl_error_msg = Label(root, font = ("Arial", 14) ,fg= "red" ,bg = "white", text="An unknown error has occured.")
-        lbl_error_msg.grid(row=2, column=1, sticky = 'n')
+        lbl_error_msg.grid(row=2, column=1, sticky = 'nw')
 
     else:
         root.withdraw()
@@ -95,7 +96,8 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    #also_like( "140206010823-b14c9d966be950314215c17923a04af7", "f08fc48b49f0e1be")
+    also_likes_graph("130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb","745409913574d4c6")
+    also_like( "140206010823-b14c9d966be950314215c17923a04af7", "f08fc48b49f0e1be")
     
     states = {"country": False, "continent": False}
 
@@ -140,8 +142,8 @@ def gui_main():
     #Shows buttons to allow for user input
     def button_show():
         btn_choose_doc.grid()
-        txt_doc.grid()
-
+        txt_doc.grid(row=0, column=0,sticky='nw')
+ 
     
     #Helper method to flip the value of the associated key in the states dictionary
     def toggle_flag(flag):
@@ -174,19 +176,14 @@ def gui_main():
         button_hide()
         
         lbl_doc_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="Document ID:")
-        lbl_doc_id.grid(row=0, column=0, sticky='sw')
+        lbl_doc_id.grid(row=0, column=0, sticky='se')
         txt_doc.grid(row=0, column=2, sticky = 'sw')
 
         lbl_user_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
-        lbl_user_id.grid(row=1, column=0, sticky='w')
+        lbl_user_id.grid(row=1, column=0, sticky='e')
         txt_userID.grid(row=1, column=2, sticky = 'w')
 
-        btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black") 
-        btn_also_likes_go.grid(row=2, column=0, sticky = 'nw')
-        
-
-
-        
+        btn_also_likes_go.grid()
 
     ##BUTTONS TO BE USED FOR STUFF
     #allows user to search for a certain document
@@ -212,6 +209,10 @@ def gui_main():
     #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
     btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: prep_also_likes())
     btn_also_likes.grid(row=1, column=4) 
+
+    btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: also_like(txt_doc.get(1.0, END), txt_userID.get(1.0, END)))
+    btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')
+    btn_also_likes_go.grid_remove()
 
     txt_userID = Text(root, font = ("Arial", 14), width = 20, height = 1, fg = "black")
     txt_userID.grid(row=0,column=0)
@@ -376,5 +377,50 @@ def also_like(documentID = None, visitorID = None):
         read_docs = [doc for curr in users for doc in docs_from_users(curr) if doc != documentID] #WHEN NO VISITOR ID
         return pd.Series(read_docs).value_counts().head(10) #COMPLETE
 
-gui_load_file()
+#REQ 6
+def also_likes_graph(documentID, userID):
+    dot = graphviz.Digraph()
 
+    # 3 - make edges between users and documents they have read!!!
+
+    read_docs = []
+    users = users_from_doc(documentID) # all users
+    for u in users:
+        if u == userID:
+            dot.node(u,u[-4:], style='filled', fillcolor='purple', shape='box')
+        else:
+            dot.node(u, u[-4:], shape='box')    
+            
+        tempDocs = docs_from_users(u)
+        for td in set(tempDocs):
+            read_docs.append(td)
+            dot.edge(u, td)
+        
+    # read_docs = set(read_docs)
+    print(read_docs)
+    for d in read_docs:
+        if d == documentID:
+            dot.node(d, d[-4:], style='filled', fillcolor='purple')
+        else:
+            dot.node(d, d[-4:])
+
+    print(read_docs)      
+
+    #iterate through all rel users, get docs they have read
+    #make edge between user and doc
+    # user list -> find all docs read (use docs_from_users()) -> where user x has read doc y -> make edge
+    
+    #need userid and docid prefreably in tuple
+    #iterate through
+    
+    # dot.node('A', 'Node A')
+    # dot.node('B', 'Node B')
+
+    # dot.edge('A', 'B', 'Edge 1')
+    # dot.edge('B', 'A', 'Edge 2')
+
+    dot.render('graph', view=True)
+
+    return
+
+gui_load_file()
