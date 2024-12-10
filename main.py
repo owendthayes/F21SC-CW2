@@ -26,10 +26,18 @@ def gui_load_file():
     root = Tk()
     
     root.title("F20SC-CW2 Data Analysis Tracker")
+    
     app_width = 700
     app_height = 300
-    root.geometry(f'{app_width}x{app_height}+{100}+{100}')
-    root.configure(bg="MediumPurple1")
+
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+
+    x = (screen_width / 2) - (app_width / 2)
+    y = (screen_height / 2) - (app_height / 2)
+    
+    root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+    root.configure(bg="MediumPurple1")  
 
     ##grid for managing placement of widgets
     root.columnconfigure(0, weight = 1)
@@ -89,14 +97,23 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    also_like("140204164129-000000006fb0c837f2196059c285ef31")
+    also_like("140206010823-b14c9d966be950314215c17923a04af7")
     
-    ##decide a document to do operations
-
     states = {"country": False, "continent": False}
 
     root.title("F20SC-CW2 Data Analysis Tracker")
-    root.geometry('1200x700')
+
+    app_width = 1200
+    app_height = 700
+
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+
+    x = (screen_width / 2) - (app_width / 2)
+    y = (screen_height / 2) - (app_height / 2)
+    
+    root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
     root.configure(bg="MediumPurple1")
 
     ##grid for managing placement of widgets
@@ -118,6 +135,7 @@ def gui_main():
         btn_views_by_browser_verbose.grid_remove()
         btn_views_by_browser_short.grid_remove()
         btn_reader_profile.grid_remove()
+        btn_also_likes.grid_remove()
         btn_back_to_load.grid_remove()
         btn_back_to_main.grid()
 
@@ -144,6 +162,7 @@ def gui_main():
         btn_views_by_browser_short.grid()
         btn_reader_profile.grid()
         btn_back_to_load.grid()
+        btn_also_likes.grid()
 
         for x in states:
             states[x] = False
@@ -153,26 +172,52 @@ def gui_main():
         root.withdraw() 
         gui_load_file() 
 
+    def prep_also_likes():
+        button_hide()
+        
+        lbl_doc_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="Document ID:")
+        lbl_doc_id.grid(row=0, column=0, sticky='sw')
+        txt_doc.grid(row=0, column=2, sticky = 'sw')
+
+        lbl_user_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
+        lbl_user_id.grid(row=1, column=0, sticky='w')
+        txt_userID.grid(row=1, column=2, sticky = 'w')
+
+        btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black") 
+        btn_also_likes_go.grid(row=2, column=0, sticky = 'nw')
+        
+
+
+        
+
     ##BUTTONS TO BE USED FOR STUFF
     #allows user to search for a certain document
     btn_view_document_country = Button(root, bg = "lavender", text = "Search visitors\nby country", font = ("Arial", 14), width = 15, height =6,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("country"))) 
-    btn_view_document_country.grid(row=0, column=1)
+    btn_view_document_country.grid(row=0, column=0)
     
     #allows user to search for a certain document
     btn_view_document_continent = Button(root, bg = "lavender", text = "Search document\nvisitors by\ncontinent", font = ("Arial", 14), width = 15, height =6 ,fg= "black", command=lambda: (button_hide(), button_show(), toggle_flag("continent")))
-    btn_view_document_continent.grid(row=0,column=3)
+    btn_view_document_continent.grid(row=0,column=2)
 
     #Generates graph displaying what browsers have been used to view documents in the file (verbose)
     btn_views_by_browser_verbose = Button(root, bg = "lavender", text = "Search document\nviews by browser\n(long)", font = ("Arial", 14), width = 15,  height =6 ,fg= "black", command=lambda:(button_hide(), create_bar_chart((views_by_browser_verbose(), "", "Views by Browser (Verbose)", "Browser", "Freq"), root)))
-    btn_views_by_browser_verbose.grid(row=1, column=0)
+    btn_views_by_browser_verbose.grid(row=0, column=4)
 
     #Generates graph displaying what browsers have been used to view documents in the file (short)
     btn_views_by_browser_short = Button(root, bg = "lavender",text = "Search document\nviews by browser\n(short)", font = ("Arial", 14), width = 15, height =6 ,fg= "black", command=lambda: (button_hide(), create_bar_chart((views_by_browser_short(), "", "Views by Browser (Short)", "Browser", "Freq"), root)))
-    btn_views_by_browser_short.grid(row=1, column=2)                                                                                                            
+    btn_views_by_browser_short.grid(row=1, column=0)                                                                                                            
 
     #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
     btn_reader_profile = Button(root, bg="lavender", text = "Top Viewers", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: (button_hide(), create_bar_chart((reader_profile(), "", "Top Readers", "UUID", "Time spent"), root)))
-    btn_reader_profile.grid(row=1, column=4)   
+    btn_reader_profile.grid(row=1, column=2)   
+
+    #Generates graph displaying the top 10 Users (ranked by most time spent reading ('event_readtime'))
+    btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 14) ,fg= "black", height =6, width = 15, command=lambda: prep_also_likes())
+    btn_also_likes.grid(row=1, column=4) 
+
+    txt_userID = Text(root, font = ("Arial", 14), width = 20, height = 1, fg = "black")
+    txt_userID.grid(row=0,column=0)
+    txt_userID.grid_remove()
 
     #text box allowing for user input
     txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20, bg = "lavender")
@@ -225,10 +270,10 @@ def gui_main():
         ax.set_title(f"{title}: {searched}")
         ax.set_xlabel(x)
         ax.set_ylabel(y)
-        ax.tick_params(axis='x', rotation=20)
+        ax.tick_params(axis='x', rotation=270)
 
         #Increases bottom margin for graph (prevents x axis title being cut off)
-        fig.subplots_adjust(bottom=0.2)
+        fig.subplots_adjust(bottom=0.3)
 
         #dictates position of graph
         canvas = FigureCanvasTkAgg(fig, master=root)
@@ -300,30 +345,17 @@ def reader_profile():
 def users_from_doc(documentID):
     #get list of users that have read the given document
     users_viewed = [obj.get("visitor_uuid") for obj in data if obj.get("env_doc_id") == documentID]
-    # for obj in data:
-    #     if obj.get("env_doc_id") is documentID:
-    #         users_viewed.append(obj.get("visitor_uuid"))
-    return pd.Series(users_viewed).value_counts()
+    return list(set(users_viewed))
             
 def docs_from_users(visitorID):
     #get list of documents that user has read
-    documents_viewed = []
-    for obj in data:
-        if obj.get("visitor_uuid") == visitorID:
-            documents_viewed.append(obj.get("env_doc_id"))
+    documents_viewed = [obj.get("env_doc_id") for obj in data if obj.get("visitor_uuid") == visitorID]
+
+    # documents_viewed = []
+    # for obj in data:
+    #     if obj.get("visitor_uuid") == visitorID:
+    #         documents_viewed.append(obj.get("env_doc_id"))
     return documents_viewed
-
-def sorting(dUUID, uUUID = None):
-    #find most popular and return in ascending order  
-
-    
-    # doc_counts = Counter(all_read_docs)  # Count the occurrences of each document
-    # sorted_docs = sorted(doc_counts.items(), key=lambda x: x[1], reverse=True)  # Sort by count in descending order
-    
-    # Optional: Extract only the document IDs, ignoring the counts
-    # sorted_doc_ids = [doc for doc, count in sorted_docs]
-    return
-    
 
 #actual function
 #what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
@@ -333,18 +365,41 @@ def also_like(documentID, visitorID = None):
     users = users_from_doc(documentID) ##gets list of users who have read a specific document id
     if visitorID:
         docs = docs_from_users(visitorID) ##gets list of documents a specific reader has read
-    # print(users)
-    # for u in users.items(): #DEBUGGING
-    #     print(u)
-
+    #for d in docs.items():
+    #    print(d)
+    print(users)
     print("2 - Lists populated")
-    #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
-    read_docs = [doc for curr_user in users.items() for doc in docs_from_users(curr_user[0])]
+    #user -> evry document -> every user- > top 10 docs
+    # user_docs = []
+    # for curr_doc in docs.items():
+    #     x = users_from_doc(curr_doc[0])
+    #     for user in x:
+    #         user_docs.append(user)
+            
+    # print(user_docs)
+
+    # user_docs = pd.Series(user_docs).value_counts()   
+    # for d in user_docs.items():
+    #     print(d)
     
-    # for u in read_docs.items(): #DEBUGGING
-    #     print("\n\n\n", u)
-    #read_docs = [docs_from_users(curr_user) for curr_user in users.items()] 
-    print("3 - top 10 list about to be generated")
+    print("cock")    
+    print("3 - top 10 list about to be generated")       
+    #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
+
+    read_docs = []
+    for curr in users:
+        x = docs_from_users(curr)
+        for doc in x:
+            if (doc != documentID):
+                read_docs.append(doc)
+
+    #read_docs = [doc for curr_user in users.items() for doc in docs_from_users(curr_user[0])] #WHEN NO VISITOR ID 
+    print("read docs before series ", read_docs)
+    read_docs = pd.Series(read_docs).value_counts().head(10)
+    print("read docs after series ", read_docs)
+    #read_docs = pd.Series(read_docs).value_counts()
+    # for u in read_docs: #DEBUGGING
+    #      print("\n\n\n", u)
     print("4 - balls")
     return pd.Series(read_docs).value_counts()
 
