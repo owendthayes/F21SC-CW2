@@ -1,14 +1,11 @@
-import json
-from tkinter import * 
-import pandas as pd
-import re
-import pycountry
-from pycountry_convert import country_alpha2_to_continent_code, convert_continent_code_to_continent_name
-import matplotlib
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from collections import Counter
-
+import json #for managing files https://docs.python.org/3/library/json.html
+from tkinter import *  #for creating a gui https://docs.python.org/3/library/tkinter.html
+import pandas as pd #for data manipulation and managing big data https://pandas.pydata.org/
+import pycountry #allows the ability to get country codes https://pypi.org/project/pycountry/
+from pycountry_convert import country_alpha2_to_continent_code, convert_continent_code_to_continent_name #allows the ability to get country codes https://pypi.org/project/pycountry/
+import matplotlib #for creating graphs https://matplotlib.org/
+from matplotlib.figure import Figure #for creating graphs https://matplotlib.org/
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #for creating graphs https://matplotlib.org/
 # TO DO LIST
 # - REQUIREMENT 5 (ALSO LIKES)
 # - REQUIREMENT 6 (ALSO LIKES GRAPH)
@@ -97,7 +94,7 @@ def clicked_load_file(filePath, root):
         
 def gui_main():
     root = Tk()
-    also_like( "140206010823-b14c9d966be950314215c17923a04af7", "f08fc48b49f0e1be")
+    #also_like( "140206010823-b14c9d966be950314215c17923a04af7", "f08fc48b49f0e1be")
     
     states = {"country": False, "continent": False}
 
@@ -336,7 +333,6 @@ def reader_profile():
     #finds the total time each user has spent reading files (by tallying any duplicates of their uuid)
     agg = df.groupby("User ID")["Read Time"].sum()
     
-    print(agg.sort_values(ascending=False).head(10))#DEBUGGING
     #returns users list tallied up with the frequency each user id has been found, will show the top 10 most seen users
     return agg.sort_values(ascending=False).head(10)
 
