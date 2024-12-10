@@ -9,15 +9,11 @@ import matplotlib #for creating graphs https://matplotlib.org/
 from matplotlib.figure import Figure #for creating graphs https://matplotlib.org/
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #for creating graphs https://matplotlib.org/
 import graphviz
-# TO DO LIST
-# - COMMAND LINE TESTING (CHECK SPEC)
-# 
-# - VIDEO
-# - REPORT
-#
-# - COMMENT CODE
-# - CHECK SPEC AGAIN FOR ANYTHING MISSING
 
+# TO DO LIST
+# - Video demo
+# - Final check of spec
+# - standalone exe
 
 ##GUI FOR CHOOSING INPUT FILE
 def gui_load_file():
@@ -25,16 +21,19 @@ def gui_load_file():
     
     root.title("F20SC-CW2 Data Analysis Tracker")
     
+    #dimensions for the page
     app_width = 700
     app_height = 300
 
+    #finding the dimensions for the users screen
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
 
+    #values used for centering the form
     x = (screen_width / 2) - (app_width / 2)
     y = (screen_height / 2) - (app_height / 2)
     
-    root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+    root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}') #makes sure form opens in centre of the screen
     root.configure(bg="MediumPurple1")  
 
     ##grid for managing placement of widgets
@@ -47,16 +46,19 @@ def gui_load_file():
     root.rowconfigure(2, weight = 1)   
 
     ##elements of main page
+    #label instructing the user to insert a file path
     lbl_load_file = Label(root, font = ("Arial", 14, 'bold') ,fg= "white", bg="MediumPurple1", height = 1, width = 30, text="Please enter the file path")
     lbl_load_file.grid(row=0, column=1, sticky = 's')
 
+    #text box to take the users file path input
     txt_filePath = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 30   )
     txt_filePath.grid(row=1, column=1,)
 
+    #button which will call file to load inputted file
     btn_choose_file = Button(root, text = "Load file", font = ("Arial", 14) ,fg= "black", bg="lavender",command=lambda: clicked_load_file(txt_filePath.get(1.0, 'end-1c'), root))
     btn_choose_file.grid(row=1, column=2, sticky = 'w')
 
-    def on_closing():
+    def on_closing(): #quitting the app
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             root.quit()
             root.destroy()
@@ -68,15 +70,15 @@ def gui_load_file():
 def clicked_load_file(filePath, root):
     global data    ##this is the parsed json data
 
-    FILE_NAME = filePath.strip()
+    FILE_NAME = filePath.strip() #strips inputted file path
     print("Processing file: {FILE_NAME}")
     try:     
         #reading in data
         with open(FILE_NAME, 'r') as file:
-            unparsed_data = file.read()
+            unparsed_data = file.read() #reads unparsed json data 
         
-        json_objects = unparsed_data.strip().split("\n")
-        data = [json.loads(obj) for obj in json_objects]
+        json_objects = unparsed_data.strip().split("\n") #strips and splits the unparsed json data , storing in json objects list
+        data = [json.loads(obj) for obj in json_objects] #list is iterated through and each element (line of json) is loaded and formatted
 
         print("File loaded Successfully")
 
@@ -96,28 +98,31 @@ def clicked_load_file(filePath, root):
         lbl_error_msg.grid(row=2, column=1, sticky = 'nw')
 
     else:
+        root.quit()
         root.destroy()
         gui_main()
         
 def gui_main():
     root = Tk()
-    #also_likes_graph("140204164129-000000006fb0c837f2196059c285ef31","96141588c97c982e")
-    #also_like( "140206010823-b14c9d966be950314215c17923a04af7", "745409913574d4c6")
     
+    #dictionary holding true or false flags which will change on button press
     states = {"country": False, "continent": False}
 
     root.title("F20SC-CW2 Data Analysis Tracker")
 
+    #dimensions of form
     app_width = 1200
     app_height = 700
 
+    #dimensions of user's screen
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
 
+    #for calculating centre page
     x = (screen_width / 2) - (app_width / 2)
     y = (screen_height / 2) - (app_height / 2)
     
-    root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+    root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}') #opens form in centre of screen
 
     root.configure(bg="MediumPurple1")
 
@@ -135,6 +140,7 @@ def gui_main():
         
     #HIDES AND SHOWS BUTTONS ALLOWING FOR GRID TO BE CREATED AVOIDING FORMATTING ISSUES
     def button_hide():
+        #hides all method choice buttons as well as anything else which is not currently needed
         btn_view_document_continent.grid_remove()
         btn_view_document_country.grid_remove()
         btn_views_by_browser_verbose.grid_remove()
@@ -146,6 +152,7 @@ def gui_main():
 
     #Shows buttons to allow for user input
     def button_show():
+        #shows button and text box allowing for user input
         btn_choose_doc.grid()
         txt_doc.grid(row=0, column=0)
  
@@ -156,12 +163,15 @@ def gui_main():
 
     #naviagtes user back to main page allowing them to select a different button 
     def back_to_main():
+        #resets text boxes to be blank
         txt_doc.delete(1.0, END)
         txt_userID.delete(1.0, END)
 
+        #clears page of widgets
         for widget in root.grid_slaves():
            widget.grid_remove()
 
+        #sets page back to its default look
         btn_view_document_continent.grid()
         btn_view_document_country.grid()
         btn_views_by_browser_verbose.grid()
@@ -170,15 +180,16 @@ def gui_main():
         btn_back_to_load.grid()
         btn_also_likes.grid()
 
-        for x in states:
+        for x in states: #sets all state flags back to false
             states[x] = False
 
     #navigates user back to initial page allowing for them to select a different file
     def back_to_load(root):
-        root.withdraw() 
+        root.destroy()
+        root.quit()
         gui_load_file() 
 
-    def prep_also_likes():
+    def prep_also_likes(): #formats page in order to prepare for also likes functionality to be implemented
         button_hide()
         
         lbl_doc_id.grid(row=0, column=0, sticky='se')
@@ -214,33 +225,42 @@ def gui_main():
     btn_also_likes = Button(root, bg="lavender", text = "Also likes", font = ("Arial", 18) ,fg= "black", height = 6, width = 20, command=lambda: prep_also_likes())
     btn_also_likes.grid(row=1, column=4) 
 
+    #gui to inform user what a text box is used for
     lbl_doc_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="Document ID:")
     lbl_doc_id.grid_remove()
 
+    #gui to inform user what a text box is used for
     lbl_user_id = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
     lbl_doc_id.grid_remove()
 
+    #label that will display the top 10 list of "also like" documents in the also_like method
     lbl_top10list = Label(root, font = ("Arial", 14) ,fg= "white" ,bg = "MediumPurple1", text="User ID:")
     lbl_top10list.grid_remove()
 
+    #a title for the top 10 list page in the also_like method
     lbl_top10title = Label(root, font = ("Arial", 18) ,fg= "white" ,bg = "MediumPurple1", text="Top 10 Documents you may also like!")
     lbl_top10list.grid_remove()
 
     def also_likes_helper(doc, user):
-        top10list = also_like(doc,user)
-        if not top10list.empty:
-            top10list = also_like(doc, user).to_dict()
-            formattedlist = ""
+        top10list = also_like(doc,user) #calls also_like method
+        if not top10list.empty: #checking if there are suggested documents
+            top10list = also_like(doc, user).to_dict() #transforms series object to a dictionary
+            formattedlist = "" 
             formattedlines = []
 
+            #remove the unnecessary elements from the window
             txt_doc.grid_remove()
             txt_userID.grid_remove()
             lbl_user_id.grid_remove()
             lbl_doc_id.grid_remove()
             btn_also_likes_go.grid_remove()
+
+            #add necessary elements into the window
             lbl_top10list.grid(row=1, column=2)
             lbl_top10title.grid(row=0, column=2)
 
+            #iterate through the dictionary, getting both the key and value - the document ID and the number of readers.
+            #adding new lines, this will output the list in a top 10 format, from most popular document to least.
             i = 0
             formattedText = ""
             for row in top10list:
@@ -248,19 +268,23 @@ def gui_main():
                 formattedText += f"Document UUID: {key} - Number of Readers:  {value}\n"
                 i+=1
 
+            #update the label on screen to display the top 10 list.
             lbl_top10list.config(text=formattedText)
         else:
+            #if no other readers have read the chosen document, there is no data and this will inform the user.
             lbl_top10list.config(text="No other users have read this document.")
 
+    #button used to initiate the also_likes method
     btn_also_likes_go = Button(root, bg = "lavender", text = "Go", font = ("Arial", 14), width = 10, height =2,fg= "black", command=lambda: (also_likes_helper(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip()), also_likes_graph(txt_doc.get(1.0, END).strip(), txt_userID.get(1.0, END).strip())))
-    btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')                                                                                 #also_like(txt_doc text, txt_userID text)
+    btn_also_likes_go.grid(row=2, column=2, sticky = 'nw')                                                                                 
     btn_also_likes_go.grid_remove()
 
+    #button used to provide a user uuid for the also_likes method
     txt_userID = Text(root, font = ("Arial", 14), width = 20, height = 1, fg = "black")
     txt_userID.grid(row=0,column=0)
     txt_userID.grid_remove()
 
-    #text box allowing for user input
+    #text box allowing for user input in a few different methods.
     txt_doc = Text(root, font = ("Arial", 14) ,fg= "black", height = 1, width = 20)
     txt_doc.grid(row=0, column=0, columnspan=5, sticky = 'w')
     txt_doc.grid_remove()
@@ -281,7 +305,7 @@ def gui_main():
             x = "continent"
             y = "freq"
         else:
-            print("WARNING: SOMETHING HAS GONE HORRIBLY WRONG")
+            print("WARNING: SOMETHING HAS GONE HORRIBLY WRONG") #warning to be thrown if no flag has been raised
 
         #returns a touple of all relevent information to then generate the chart
         return freq ,txt_doc.get(1.0, END).strip() ,title, x, y
@@ -321,7 +345,7 @@ def gui_main():
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=1, column=2, sticky="nsew")
         
-    def on_closing():
+    def on_closing(): #closing the page 
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             root.quit()
             root.destroy()
@@ -342,7 +366,7 @@ def search_continent(document):
     continents = [convert_continent_code_to_continent_name(country_alpha2_to_continent_code(country)) for country in countries]
     return pd.Series(continents).value_counts() #returns a tallied up version of the list showing the continents and frequency of visitors
 
-##REQ 3 A e.g. entire useragent string
+##REQ 3 A - entire useragent string
 def views_by_browser_verbose():
     browsers = []
 
@@ -354,11 +378,9 @@ def views_by_browser_verbose():
     freq = pd.Series(browsers).value_counts()
 
     #returning most popular browser
-    print(browsers)
-    print(freq) #DEBUGGING
     return freq
 
-##REQ 3 B e.g. 'Mozilla'
+##REQ 3 B - e.g. 'Mozilla'
 def views_by_browser_short():
     browsers = []
 
@@ -371,10 +393,9 @@ def views_by_browser_short():
     freq = pd.Series(browsers).value_counts()
 
     #returning most popular browser
-    print(freq) #DEBUGGING
     return freq
 
-##REQ 4
+##REQ 4 - top 10 reader profile
 def reader_profile():
     #creates list of all user ids and time spent reading found in the list allowing for duplicate entries
     user_time = [(obj.get("visitor_uuid"), obj.get("event_readtime", 0)) for obj in data if "event_readtime" in obj]
@@ -386,7 +407,7 @@ def reader_profile():
     #returns users list tallied up with the frequency each user id has been found, will show the top 10 most seen users
     return agg.sort_values(ascending=False).head(10)
 
-##REQ 5
+##REQ 5 - also_like top 10 list
 #helper functions
 def users_from_doc(documentID):
     #get list of users that have read the given document
@@ -399,11 +420,7 @@ def docs_from_users(visitorID):
     return documents_viewed
 
 #actual function
-#what the fuck is a parameter sorting fucktion sakjdpakisdjmdsgsdaf
 def also_like(documentID, visitorID):
-    print("DocID: ", documentID)
-    print("UserID: ", visitorID)
-    
     #get list of "Liked documents"
     if documentID:
         users = users_from_doc(documentID) ##gets list of users who have read a specific document id
@@ -422,43 +439,39 @@ def also_like(documentID, visitorID):
             common_users = list(set(user_docs)) #contains all other users which have read a document in common (no duplicates)
         #finds all documents the common_users have read and gets the frequency each document has been viewed
         user_docs_result = [doc for curr_user in common_users for doc in docs_from_users(curr_user)]
-        print("PRinting this piece", pd.Series(user_docs_result).value_counts().head(10)) #COMPLETE
-        return pd.Series(user_docs_result).value_counts().head(10) #COMPLETE
+        return pd.Series(user_docs_result).value_counts().head(10) #returns top 10
     else:
         #we wanna get all the other readers of this document, and then see everything else they have read. then tally the top 10 most common
         read_docs = [doc for curr in users for doc in docs_from_users(curr) if doc != documentID] #WHEN NO VISITOR ID
-        print("Series: ", pd.Series(read_docs).value_counts().head(10))
-        return pd.Series(read_docs).value_counts().head(10) #COMPLETE
+        return pd.Series(read_docs).value_counts().head(10) #returns top 10
 
-#REQ 6
+#REQ 6 - also_like graph
 def also_likes_graph(documentID, userID):
-    print("documentID: ", documentID, type(documentID))
-    print("userID: ", userID, type(userID))
-    dot = graphviz.Digraph()
+    dot = graphviz.Digraph() #creates digraph
 
     # 3 - make edges between users and documents they have read!!!
     try:
         read_docs = []
-        users = users_from_doc(documentID) # all users
-        for u in users:
-            if u == userID:
-                dot.node(u,u[-4:], style='filled', fillcolor='purple', shape='box')
+        users = users_from_doc(documentID) # gets all users who have viewed this document
+        for u in users: #iterates through all the users
+            if u == userID: #if the current user is the user id specified
+                dot.node(u,u[-4:], style='filled', fillcolor='purple', shape='box') #create node coloured purple (square)
             else:
-                dot.node(u, u[-4:], shape='box')    
+                dot.node(u, u[-4:], shape='box') #create regular node (square)
 
-            tempDocs = docs_from_users(u) #dont edge me hah
-            for td in set(tempDocs):
-                read_docs.append(td)
-                dot.edge(u, td)
+            tempDocs = docs_from_users(u) #creates temporary list of every document the current user has read
+            for td in set(tempDocs): #iterates through the temporary documents
+                read_docs.append(td) #adds to read_docs
+                dot.edge(u, td) #creates an edge between the current user this document
         
-        # read_docs = set(read_docs)
-        for d in read_docs:
-            if d == documentID:
-                dot.node(d, d[-4:], style='filled', fillcolor='purple')
-            else:
-                dot.node(d, d[-4:])
 
-        dot.render('graph', view=True)
+        for d in read_docs: #loops through read documents
+            if d == documentID: #checks if current document is the document specified
+                dot.node(d, d[-4:], style='filled', fillcolor='purple') #create node coloured purple
+            else:
+                dot.node(d, d[-4:]) #create regular node 
+
+        dot.render('graph', view=True) #creates graph
     except:
         #If no other users have viewed the graph, inform the user.
         dot.node('A', 'No other users have viewed this document yet.', style = 'filled', fillcolor='red')
